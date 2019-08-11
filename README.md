@@ -4,9 +4,9 @@ Back End Challenge
 This code challenge allows you to demonstrate your ability to build a simple web server, but gives us a chance to see how you code and how you use version control.
 
 ## Things we're looking for
-- Clean & readable code is super important, as it means it's easier for people to read, reuse, and refactor your work
-- Good use of version control means it's easy for people to check and review your code
-- Using a testing framework (where applicable) means you're more likely to deliver robust code
+- Clean & readable code is super important, as it means it's easier for people to read, reuse, and refactor your work.
+- Good use of version control means it's easy for people to check and review your code.
+- [Using a testing framework](https://medium.com/javascript-scene/tdd-changed-my-life-5af0ce099f80) (where applicable) means you're more likely to deliver robust code.
 
 ## The Challenge
 
