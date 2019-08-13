@@ -112,7 +112,7 @@ def create_app(config_name):
             if not car:
                 return jsonify({
                     "status": 404,
-                    "message": "Car is not found"
+                    "message": "Car not found"
                 })
 
             if "make" in request_data.keys():
@@ -160,7 +160,7 @@ def create_app(config_name):
             if not car:
                 return jsonify({
                     "status": 404,
-                    "message": "Car is not found"
+                    "message": "Car not found"
                 })
 
             car.delete()

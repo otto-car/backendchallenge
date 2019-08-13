@@ -150,7 +150,8 @@ class CarTestCase(unittest.TestCase):
         res = self.client.post('/car/update', data=json.dumps(data), content_type='application/json')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
-        self.assertEqual(json_response['response'], "Couldn't update car: ID doesn't exist")
+        self.assertEqual(json_response['status'], 404)
+        self.assertEqual(json_response['message'], "Car not found")
 
     def test_cant_update_car_invalid_parameters(self):
         """ Test can't update car with wrong or missing ID"""
@@ -158,13 +159,15 @@ class CarTestCase(unittest.TestCase):
         res = self.client.post('/car/update', data=json.dumps(data), content_type='application/json')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
-        self.assertEqual(json_response['response'], "Missing car ID parameter")
+        self.assertEqual(json_response['status'], 400)
+        self.assertEqual(json_response['message'], "Missing car ID")
 
-        data = dict(car_id="kawabanga!", model="C45 AMG")
+        data = dict(car_id="cowabunga!", model="C45 AMG")
         res = self.client.post('/car/update', data=json.dumps(data), content_type='application/json')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
-        self.assertEqual(json_response['response'], "Invalid car ID parameter")
+        self.assertEqual(json_response['status'], 400)
+        self.assertEqual(json_response['message'], "Invalid car ID")
 
     def test_can_delete_car(self):
         """ Test can delete car """
@@ -191,7 +194,7 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
         self.assertEqual(json_response['status'], 404)
-        self.assertEqual(json_response['message'], "Car is not found")
+        self.assertEqual(json_response['message'], "Car not found")
 
         data = dict(car_id="i_love_pizza")
         res = self.client.delete('/car/delete', query_string=data, content_type='application/json')
