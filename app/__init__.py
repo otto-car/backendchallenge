@@ -66,4 +66,23 @@ def create_app(config_name):
             else:
                 return jsonify({"response": message})
 
+    @app.route('/car/get', methods=['GET'])
+    def car_get():
+        if request.method == "GET":
+            car_id = request.args.get('car_id')
+
+            if not car_id:
+                return jsonify({"response": "Missing car ID parameter"})
+
+            try:
+                int(car_id)
+            except:
+                return jsonify({"response": "Invalid car ID parameter"})
+
+            car = Car.get(car_id)
+            if not car:
+                return jsonify({"response": "Car doesn't exist"})
+
+            return jsonify(car.serialize())
+
     return app

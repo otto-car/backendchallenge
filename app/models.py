@@ -26,8 +26,17 @@ class Car(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    def get(self, id):
-        return self.query.get(id)
+    def get(car_id):
+        return db.session.query(Car).filter(Car.id == car_id).first()
 
     def update(self, id, data):
         return db.session.query(Car).filter_by(id=id).update(data)
+
+    def serialize(self):
+        return {
+            "make": self.make,
+            "model": self.model,
+            "year": self.year,
+            "assign_type": self.assigned_type,
+            "assign_id": self.assigned_id
+        }
