@@ -229,7 +229,81 @@ class CarTestCase(unittest.TestCase):
 
 
 class BranchTestCase(unittest.TestCase):
-    pass
+    def setUp(self):
+        self.app = create_app(config_name="testing")
+        self.client = self.app.test_client()
+
+        # set up test db
+        with self.app.app_context():
+            db.create_all()
+
+    def test_can_create_branch(self):
+        data = dict(city="London", postcode="E1W 3SS", capacity=5)
+        json_response = api_call(self, "POST", "/branch/create", data, 200, True)
+        self.assertEqual(json_response["status"], 201)
+        self.assertEqual(json_response["message"], 'Branch created')
+
+    def test_cant_create_branch_invalid_request(self):
+        res = self.client.post('/branch/create')
+        self.assertEqual(res.status_code, 400)
+
+        res = self.client.post('/branch/create', data=None, content_type='application/json')
+        self.assertEqual(res.status_code, 400)
+
+        res = self.client.get('/branch/create')
+        self.assertEqual(res.status_code, 405)
+
+    def test_cant_create_branch_missing_or_invalid_params(self):
+        data = dict()
+        json_response = api_call(self, "POST", "/branch/create", data, 200, True)
+        self.assertEqual(json_response["status"], 400)
+        self.assertEqual(json_response["message"], "Missing city")
+
+        data = dict(postcode="E1W 3SS", capacity=5)
+        json_response = api_call(self, "POST", "/branch/create", data, 200, True)
+        self.assertEqual(json_response["status"], 400)
+        self.assertEqual(json_response["message"], "Missing city")
+
+        data = dict(city="London", capacity=5)
+        json_response = api_call(self, "POST", "/branch/create", data, 200, True)
+        self.assertEqual(json_response["status"], 400)
+        self.assertEqual(json_response["message"], "Missing postcode")
+
+        data = dict(city="London", postcode="123456789123", capacity=5)
+        json_response = api_call(self, "POST", "/branch/create", data, 200, True)
+        self.assertEqual(json_response["status"], 400)
+        self.assertEqual(json_response["message"], "Invalid postcode")
+
+        data = dict(city="London", postcode="SE157 258GU2", capacity=5)
+        json_response = api_call(self, "POST", "/branch/create", data, 200, True)
+        self.assertEqual(json_response["status"], 400)
+        self.assertEqual(json_response["message"], "Invalid postcode")
+
+        data = dict(city="London", postcode="SE2", capacity=5)
+        json_response = api_call(self, "POST", "/branch/create", data, 200, True)
+        self.assertEqual(json_response["status"], 400)
+        self.assertEqual(json_response["message"], "Invalid postcode")
+
+        data = dict(city="London", postcode="SE2X2", capacity=5)
+        json_response = api_call(self, "POST", "/branch/create", data, 200, True)
+        self.assertEqual(json_response["status"], 400)
+        self.assertEqual(json_response["message"], "Invalid postcode")
+
+        data = dict(city="London", postcode="E1W 3SS")
+        json_response = api_call(self, "POST", "/branch/create", data, 200, True)
+        self.assertEqual(json_response["status"], 400)
+        self.assertEqual(json_response["message"], "Missing capacity")
+
+        data = dict(city="London", postcode="E1W 3SS", capacity="super")
+        json_response = api_call(self, "POST", "/branch/create", data, 200, True)
+        self.assertEqual(json_response["status"], 400)
+        self.assertEqual(json_response["message"], "Invalid capacity")
+
+    def tearDown(self):
+        with self.app.app_context():
+            # drop all tables
+            db.session.remove()
+            db.drop_all()
 
 
 class DriverTestCase(unittest.TestCase):
