@@ -71,7 +71,31 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response['response'], 'Both assigned type and assigned id must be provided.')
 
     def test_can_get_car(self):
-        pass
+        data = dict(car_id=1)
+        res = self.client.get('/car/get/', query_string=data, content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        json_response = res.get_json()
+        self.assertEqual(json_response['make'], 'BMW')
+        self.assertEqual(json_response['model'], '530d')
+        self.assertEqual(json_response['year'], '2018')
+
+    def test_cant_get_car_invalid_request(self):
+        res = self.client.get('/car/get/')
+        self.assertEqual(res.status_code, 400)
+
+    def test_cant_get_car_missing_params(self):
+        data = dict()
+        res = self.client.get('/car/get/', query_string=data, content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        json_response = res.get_json()
+        self.assertEqual(json_response['response'], 'Missing car ID parameter')
+
+    def test_cant_get_car_id_doesn_exist(self):
+        data = dict(car_id=100)
+        res = self.client.get('/car/get/', query_string=data, content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        json_response = res.get_json()
+        self.assertEqal(json_response['response'], "Car doesn't exist")
 
     def test_can_update_car(self):
         pass
