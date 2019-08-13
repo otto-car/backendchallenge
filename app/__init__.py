@@ -316,4 +316,39 @@ def create_app(config_name):
 
             return jsonify({"response": "Branch record was updated"})
 
+    @app.route('/branch/delete', methods=['DELETE'])
+    def branch_delete():
+        if request.method == "DELETE":
+
+            if not "branch_id" in request.args:
+                return jsonify({
+                    "status": 400,
+                    "message": "Missing branch ID"
+                })
+
+            branch_id = request.args.get("branch_id")
+
+            try:
+                int(branch_id)
+            except:
+                return jsonify({
+                    "status": 400,
+                    "message": "Invalid branch ID"
+                })
+
+            branch = Branch.get(branch_id)
+
+            if not branch:
+                return jsonify({
+                    "status": 404,
+                    "message": "Branch not found"
+                })
+
+            branch.delete()
+
+            return jsonify({
+                "status": 200,
+                "message": "Branch deleted"
+            })
+
     return app
