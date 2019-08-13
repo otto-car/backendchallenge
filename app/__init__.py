@@ -86,7 +86,7 @@ def create_app(config_name):
 
             return jsonify(car.serialize())
 
-    @app.route('/car/update', methods=['post'])
+    @app.route('/car/update', methods=['POST'])
     def car_update():
         if request.method == "POST":
             request_data = request.get_json(force=True)
@@ -118,4 +118,27 @@ def create_app(config_name):
             car.save()
 
             return jsonify({"response": "Car record was updated"})
+
+    @app.route('/car/delete', methods=['DELETE'])
+    def car_delete():
+        if request.method == "DELETE":
+
+            if not "car_id" in request.args:
+                return jsonify({"response": "Missing car ID parameter"})
+
+            car_id = request.args.get("car_id")
+
+            try:
+                int(car_id)
+            except:
+                return jsonify({"response": "Invalid car ID parameter"})
+
+            car = Car.get(car_id)
+            if not car:
+                return jsonify({"response": "Car doesn't exist"})
+
+            car.delete()
+
+            return jsonify({"response": "Car deleted"})
+
     return app

@@ -178,7 +178,7 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response['response'], 'Car deleted')
 
         data = dict(car_id=1)
-        res = self.client.delete('/car/get', query_string=data, content_type='application/json')
+        res = self.client.get('/car/get', query_string=data, content_type='application/json')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
         self.assertEqual(json_response['response'], "Car doesn't exist")
@@ -189,21 +189,21 @@ class CarTestCase(unittest.TestCase):
         res = self.client.delete('/car/delete', query_string=data, content_type='application/json')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
-        self.assertEqual(json_response['response'], 'Invalid car ID')
+        self.assertEqual(json_response['response'], "Car doesn't exist")
 
         data = dict(car_id="i_love_pizza")
         res = self.client.delete('/car/delete', query_string=data, content_type='application/json')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
-        self.assertEqual(json_response['response'], 'Invalid car ID')
+        self.assertEqual(json_response['response'], 'Invalid car ID parameter')
 
     def test_cant_delete_car_invalid_request(self):
         """ Test we can't delete car with bad request"""
         data = dict()
-        res = self.client.delete('/car/delete', query_string=data, content_type='application/json')
+        res = self.client.delete('/car/delete', data=data, content_type='application/json')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
-        self.assertEqual(json_response['response'], 'Missing car ID')
+        self.assertEqual(json_response['response'], 'Missing car ID parameter')
 
     def test_can_assign_car_to_driver(self):
         pass
