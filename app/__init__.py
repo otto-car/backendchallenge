@@ -2,12 +2,13 @@ from flask_api import FlaskAPI
 from flask_sqlalchemy import SQLAlchemy
 from instance.config import app_config
 from flask import request, jsonify, abort
+import re
 
 db = SQLAlchemy()
 
 
 def create_app(config_name):
-    from app.models import Car
+    from app.models import Car, Branch
 
     app = FlaskAPI(__name__, instance_relative_config=True)
     app.config.from_object(app_config[config_name])
@@ -183,5 +184,60 @@ def create_app(config_name):
                 "status": 200,
                 "message": "Car deleted"
             })
+
+    @app.route('/branch/create', methods=['POST'])
+    def branch_create():
+        if request.method == "POST":
+            request_data = request.get_json(force=True)
+
+            # Make, model and year are necessary in order to create a car object
+            if "city" in request_data.keys():
+                city = request_data['city']
+            else:
+                return jsonify({
+                    "status": 400,
+                    "message": "Missing city"
+                })
+
+            if "postcode" in request_data.keys():
+                postcode = request_data['postcode']
+                if len(postcode) > 8:
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid postcode"
+                    })
+                pattern = re.compile(r'\b[A-Z]{1,2}[0-9][A-Z0-9]? [0-9][ABD-HJLNP-UW-Z]{2}\b')
+                if not pattern.match(postcode):
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid postcode"
+                    })
+            else:
+                return jsonify({
+                    "status": 400,
+                    "message": "Missing postcode"
+                })
+
+            if "capacity" in request_data.keys():
+                try:
+                    int(request_data['capacity'])
+                    capacity = request_data['capacity']
+                except:
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid capacity"
+                    })
+            else:
+                return jsonify({
+                    "status": 400,
+                    "message": "Missing capacity"
+                })
+
+            car = Branch(city, postcode, capacity)
+            car.save()
+            return jsonify({
+                "status": 201,
+                "message": "Branch created"}
+            )
 
     return app
