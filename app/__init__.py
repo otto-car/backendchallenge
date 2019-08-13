@@ -20,30 +20,37 @@ def create_app(config_name):
         if request.method == "POST":
             request_data = request.get_json(force=True)
 
-            error = False
-            message = ""
-
             # Make, model and year are necessary in order to create a car object
-            make = ""
             if "make" in request_data.keys():
                 make = request_data['make']
             else:
-                error = True
-                message = message + "Missing car make. "
+                return jsonify({
+                    "status": 400,
+                    "message": "Missing make"
+                })
 
-            model = ""
             if "model" in request_data.keys():
                 model = request_data['model']
             else:
-                error = True
-                message = message + "Missing car model. "
+                return jsonify({
+                    "status": 400,
+                    "message": "Missing model"
+                })
 
-            year = ""
             if "year" in request_data.keys():
-                year = request_data['year']
+                try:
+                    int(request_data['year'])
+                    year = request_data['year']
+                except:
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid year"
+                    })
             else:
-                error = True
-                message = message + "Missing car year. "
+                return jsonify({
+                    "status": 400,
+                    "message": "Missing year"
+                })
 
             assigned_type = None
             if "assigned_type" in request_data.keys():
@@ -54,18 +61,17 @@ def create_app(config_name):
                 assigned_id = request_data['assigned_id']
 
             if (assigned_type or assigned_id) and not (assigned_type and assigned_id):
-                error = True
-                message = message + "Both assigned type and assigned id must be provided."
+                return jsonify({
+                    "status": 400,
+                    "message": "Both assigned type and id must be present"
+                })
 
-            if not error:
-                car = Car(make, model, year, assigned_type, assigned_id)
-
-                car.save()
-
-                message = "Successfully saved a car object."
-                return jsonify({"response": message})
-            else:
-                return jsonify({"response": message})
+            car = Car(make, model, year, assigned_type, assigned_id)
+            car.save()
+            return jsonify({
+                "status": 201,
+                "message": "Car created"}
+            )
 
     @app.route('/car/get', methods=['GET'])
     def car_get():
