@@ -92,19 +92,28 @@ def create_app(config_name):
             request_data = request.get_json(force=True)
 
             if "car_id" not in request_data.keys():
-                return jsonify({"response": "Missing car ID parameter"})
+                return jsonify({
+                    "status": 400,
+                    "message": "Missing car ID"
+                })
 
             car_id = request_data['car_id']
 
             try:
                 int(car_id)
             except:
-                return jsonify({"response": "Invalid car ID parameter"})
+                return jsonify({
+                    "status": 400,
+                    "message": "Invalid car ID"
+                })
 
             car = Car.get(car_id)
 
             if not car:
-                return jsonify({"response": "Couldn't update car: ID doesn't exist"})
+                return jsonify({
+                    "status": 404,
+                    "message": "Car is not found"
+                })
 
             if "make" in request_data.keys():
                 car.make = request_data['make']
@@ -113,7 +122,14 @@ def create_app(config_name):
                 car.model = request_data['model']
 
             if "year" in request_data.keys():
-                car.year = request_data['year']
+                try:
+                    int(request_data['year'])
+                    car.year = request_data['year']
+                except:
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid year"
+                    })
 
             car.save()
 
@@ -138,12 +154,15 @@ def create_app(config_name):
                     "status": 400,
                     "message": "Invalid car ID"
                 })
+
             car = Car.get(car_id)
+
             if not car:
                 return jsonify({
                     "status": 404,
                     "message": "Car is not found"
                 })
+
             car.delete()
 
             return jsonify({
