@@ -11,7 +11,7 @@ class CarTestCase(unittest.TestCase):
         with self.app.app_context():
             db.create_all()
 
-    def test_can_create_car(self):
+    def test_can_create_car_without_assigning(self):
         """ Test that API can create a new car via POST request to the endpoint"""
         data = dict(make="Tesla", model="Model 3", year=2018)
 
@@ -20,6 +20,9 @@ class CarTestCase(unittest.TestCase):
 
         json_response = res.get_json()
         self.assertEqual(json_response['response'], 'Successfully saved a car object.')
+
+    def test_can_create_car_with_assigning(self):
+        pass
 
     def test_cant_create_car_invalid_request(self):
         """ Test that API will return 400 (bad request) for invalid requests"""
@@ -30,7 +33,42 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 400)
 
     def test_cant_create_car_missing_params(self):
-        pass
+        """ Test that API will return expected errors when params are missing"""
+        data = dict()
+        res = self.client.post('/car/create', data=json.dumps(data), content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        json_response = res.get_json()
+        self.assertEqual(json_response['response'], 'Missing car make. Missing car model. Missing car year. ')
+
+        data = dict(model="Model 3", year=2018)
+        res = self.client.post('/car/create', data=json.dumps(data), content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        json_response = res.get_json()
+        self.assertEqual(json_response['response'], 'Missing car make. ')
+
+        data = dict(make="Tesla", year=2018)
+        res = self.client.post('/car/create', data=json.dumps(data), content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        json_response = res.get_json()
+        self.assertEqual(json_response['response'], 'Missing car model. ')
+
+        data = dict(make="Tesla", model="Model 3")
+        res = self.client.post('/car/create', data=json.dumps(data), content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        json_response = res.get_json()
+        self.assertEqual(json_response['response'], 'Missing car year. ')
+
+        data = dict(make="Tesla", model="Model 3", year=2018, assigned_type=1)
+        res = self.client.post('/car/create', data=json.dumps(data), content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        json_response = res.get_json()
+        self.assertEqual(json_response['response'], 'Both assigned type and assigned id must be provided.')
+
+        data = dict(make="Tesla", model="Model 3", year=2018, assigned_id=1)
+        res = self.client.post('/car/create', data=json.dumps(data), content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        json_response = res.get_json()
+        self.assertEqual(json_response['response'], 'Both assigned type and assigned id must be provided.')
 
     def test_can_get_car(self):
         pass
@@ -45,6 +83,12 @@ class CarTestCase(unittest.TestCase):
         pass
 
     def test_can_assign_car_to_branch(self):
+        pass
+
+    def test_wont_assign_to_non_existing_driver(self):
+        pass
+
+    def test_wont_assign_to_non_existing_branch(self):
         pass
 
     def tearDown(self):
