@@ -71,6 +71,7 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response['response'], 'Both assigned type and assigned id must be provided.')
 
     def test_can_get_car(self):
+        """ Test that API can retrieve a car"""
         data = dict(make="BMW", model="530d", year=2018)
         self.client.post('/car/create', data=json.dumps(data), content_type='application/json')
 
@@ -83,19 +84,28 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response['year'], 2018)
 
     def test_cant_get_car_invalid_request(self):
+        """ Test that endpoint can deal with missing query string"""
         res = self.client.get('/car/get')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
         self.assertEqual(json_response['response'], 'Missing car ID parameter')
 
     def test_cant_get_car_missing_params(self):
+        """ Test that endpoint can deal with empty param"""
         data = dict()
         res = self.client.get('/car/get', query_string=data, content_type='application/json')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
         self.assertEqual(json_response['response'], 'Missing car ID parameter')
 
+        data = dict(car_id=None)
+        res = self.client.get('/car/get', query_string=data, content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        json_response = res.get_json()
+        self.assertEqual(json_response['response'], 'Missing car ID parameter')
+
     def test_cant_get_car_id_doesnt_exist(self):
+        """ Test can't get car ID that doesn't exist"""
         data = dict(car_id=100)
         res = self.client.get('/car/get', query_string=data, content_type='application/json')
         self.assertEqual(res.status_code, 200)
@@ -103,6 +113,7 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response['response'], "Car doesn't exist")
 
     def test_cant_get_car_id_has_to_be_int(self):
+        """ Test can't get a car with invalid car ID """
         data = dict(car_id="abcd")
         res = self.client.get('/car/get', query_string=data, content_type='application/json')
         self.assertEqual(res.status_code, 200)
