@@ -102,7 +102,20 @@ def create_app(config_name):
                 return jsonify({"response": "Invalid car ID parameter"})
 
             car = Car.get(car_id)
+
             if not car:
                 return jsonify({"response": "Couldn't update car: ID doesn't exist"})
-            return jsonify({"response": "Car updated"})
+
+            if "make" in request_data.keys():
+                car.make = request_data['make']
+
+            if "model" in request_data.keys():
+                car.model = request_data['model']
+
+            if "year" in request_data.keys():
+                car.year = request_data['year']
+
+            car.save()
+
+            return jsonify({"response": "Car record was updated"})
     return app
