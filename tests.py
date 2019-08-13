@@ -347,6 +347,54 @@ class BranchTestCase(unittest.TestCase):
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], "Invalid branch ID")
 
+    def test_can_update_branch(self):
+        """ Test for updating branch details"""
+        data = dict(city="London", postcode="E1W 3SS", capacity=5)
+        api_call(self, "POST", '/branch/create', data, 200)
+
+        data = dict(branch_id=1)
+        json_response = api_call(self, "GET", '/branch/get', data, 200, True)
+        self.assertEqual(json_response['city'], 'London')
+        self.assertEqual(json_response['postcode'], 'E1W 3SS')
+        self.assertEqual(json_response['capacity'], 5)
+
+        data = dict(branch_id=1, city="Guildford", postcode="GU2 8DJ", capacity=100)
+        api_call(self, "PUT", '/branch/update', data, 200)
+
+        data = dict(branch_id=1)
+        json_response = api_call(self, "GET", '/branch/get', data, 200, True)
+        self.assertEqual(json_response['city'], 'Guildford')
+        self.assertEqual(json_response['postcode'], 'GU2 8DJ')
+        self.assertEqual(json_response['capacity'], 100)
+
+        data = dict(branch_id=1, capacity=90)
+        api_call(self, "PUT", '/branch/update', data, 200)
+
+        data = dict(branch_id=1)
+        json_response = api_call(self, "GET", '/branch/get', data, 200, True)
+        self.assertEqual(json_response['city'], 'Guildford')
+        self.assertEqual(json_response['postcode'], 'GU2 8DJ')
+        self.assertEqual(json_response['capacity'], 90)
+
+    def test_cant_update_branch_invalid_id(self):
+        """ Test that cant update branch with ID that doesn't exist"""
+        data = dict(branch_id=257, capacity=25)
+        json_response = api_call(self, "PUT", '/branch/update', data, 200, True)
+        self.assertEqual(json_response['status'], 404)
+        self.assertEqual(json_response['message'], "Branch not found")
+
+    def test_cant_update_car_invalid_parameters(self):
+        """ Test can't update branch with wrong or missing ID"""
+        data = dict(capacity=2018)
+        json_response = api_call(self, "PUT", '/branch/update', data, 200, True)
+        self.assertEqual(json_response['status'], 400)
+        self.assertEqual(json_response['message'], "Missing branch ID")
+
+        data = dict(branch_id="xplain_this", capacity=30)
+        json_response = api_call(self, "PUT", '/branch/update', data, 200, True)
+        self.assertEqual(json_response['status'], 400)
+        self.assertEqual(json_response['message'], "Invalid branch ID")
+
     def tearDown(self):
         with self.app.app_context():
             # drop all tables
