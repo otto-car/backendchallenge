@@ -3,6 +3,24 @@ from app import create_app, db
 from flask import json
 
 
+def api_call(self, method, url, data, status_code, return_jason=False):
+    if method == "POST":
+        res = self.client.post(url, data=json.dumps(data), content_type='application/json')
+    elif method == "GET":
+        pass
+    elif method == "DELETE":
+        pass
+    elif method == "PUT":
+        pass
+    else:
+        return False
+
+    self.assertEqual(res.status_code, status_code)
+
+    if return_jason:
+        return res.get_json()
+
+
 class CarTestCase(unittest.TestCase):
     def setUp(self):
         self.app = create_app(config_name="testing")
@@ -15,9 +33,7 @@ class CarTestCase(unittest.TestCase):
     def test_can_create_car_without_assigning(self):
         """ Test that API can create a new car via POST request to the endpoint"""
         data = dict(make="Tesla", model="Model 3", year=2018)
-        res = self.client.post('/car/create', data=json.dumps(data), content_type='application/json')
-        self.assertEqual(res.status_code, 200)
-        json_response = res.get_json()
+        json_response = api_call(self, "POST", "/car/create", data, 200, True)
         self.assertEqual(json_response['status'], 201)
         self.assertEqual(json_response['message'], 'Car created')
 
@@ -33,53 +49,38 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 400)
 
         data = dict(make="Tesla", model="Model 3", year="Stringy McStringface")
-        res = self.client.post('/car/create', data=json.dumps(data), content_type='application/json')
-        self.assertEqual(res.status_code, 200)
-        json_response = res.get_json()
+        json_response = api_call(self, "POST", "/car/create", data, 200, True)
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], 'Invalid year')
 
     def test_cant_create_car_missing_params(self):
         """ Test that API will return expected errors when params are missing"""
-        data = dict()
-        res = self.client.post('/car/create', data=json.dumps(data), content_type='application/json')
-        self.assertEqual(res.status_code, 200)
-        json_response = res.get_json()
+        json_response = api_call(self, "POST", "/car/create", dict(), 200, True)
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], 'Missing make')
 
         data = dict(model="Model 3", year=2018)
-        res = self.client.post('/car/create', data=json.dumps(data), content_type='application/json')
-        self.assertEqual(res.status_code, 200)
-        json_response = res.get_json()
+        json_response = api_call(self, "POST", "/car/create", data, 200, True)
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], 'Missing make')
 
         data = dict(make="Tesla", year=2018)
-        res = self.client.post('/car/create', data=json.dumps(data), content_type='application/json')
-        self.assertEqual(res.status_code, 200)
-        json_response = res.get_json()
+        json_response = api_call(self, "POST", "/car/create", data, 200, True)
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], 'Missing model')
 
         data = dict(make="Tesla", model="Model 3")
-        res = self.client.post('/car/create', data=json.dumps(data), content_type='application/json')
-        self.assertEqual(res.status_code, 200)
-        json_response = res.get_json()
+        json_response = api_call(self, "POST", "/car/create", data, 200, True)
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], 'Missing year')
 
         data = dict(make="Tesla", model="Model 3", year=2018, assigned_type=1)
-        res = self.client.post('/car/create', data=json.dumps(data), content_type='application/json')
-        self.assertEqual(res.status_code, 200)
-        json_response = res.get_json()
+        json_response = api_call(self, "POST", "/car/create", data, 200, True)
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], 'Both assigned type and id must be present')
 
         data = dict(make="Tesla", model="Model 3", year=2018, assigned_id=1)
-        res = self.client.post('/car/create', data=json.dumps(data), content_type='application/json')
-        self.assertEqual(res.status_code, 200)
-        json_response = res.get_json()
+        json_response = api_call(self, "POST", "/car/create", data, 200, True)
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], 'Both assigned type and id must be present')
 
@@ -141,7 +142,7 @@ class CarTestCase(unittest.TestCase):
     def test_can_update_car(self):
         """ Test for updating car details"""
         data = dict(make="Tesla", model="Model 3", year=2015)
-        self.client.post('/car/create', data=json.dumps(data), content_type='application/json')
+        api_call(self, "POST", '/car/create', data, 200)
 
         data = dict(car_id=1, model="Model X")
         res = self.client.post('/car/update', data=json.dumps(data), content_type='application/json')
@@ -190,7 +191,7 @@ class CarTestCase(unittest.TestCase):
     def test_can_delete_car(self):
         """ Test can delete car """
         data = dict(make="Tesla", model="Model 3", year=2015)
-        self.client.post('/car/create', data=json.dumps(data), content_type='application/json')
+        api_call(self, "POST", '/car/create', data, 200)
 
         data = dict(car_id=1)
         res = self.client.delete('/car/delete', query_string=data, content_type='application/json')
