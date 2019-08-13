@@ -305,7 +305,7 @@ class BranchTestCase(unittest.TestCase):
     def test_can_get_branch(self):
         """ Test that API can retrieve a branch"""
         data = dict(city="London", postcode="E1W 3SS", capacity=5)
-        self.client.post('/branch/create', data=json.dumps(data), content_type='application/json')
+        api_call(self, "POST", '/branch/create', data, 200)
 
         data = dict(branch_id=1)
         json_response = api_call(self, "GET", '/branch/get', data, 200, True)

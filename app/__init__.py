@@ -240,4 +240,31 @@ def create_app(config_name):
                 "message": "Branch created"}
             )
 
+    @app.route('/branch/get', methods=['GET'])
+    def branch_get():
+        if request.method == "GET":
+            branch_id = request.args.get('branch_id')
+
+            if not branch_id:
+                return jsonify({
+                    "status": 400,
+                    "message": "Missing branch ID"
+                })
+            try:
+                int(branch_id)
+            except:
+                return jsonify({
+                    "status": 400,
+                    "message": "Invalid branch ID"
+                })
+
+            branch = Branch.get(branch_id)
+            if not branch:
+                return jsonify({
+                    "status": 404,
+                    "message": "Branch not found"
+                })
+
+            return jsonify(branch.serialize())
+
     return app
