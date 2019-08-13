@@ -130,7 +130,7 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response['year'], 2015)
 
     def test_cant_update_car_invalid_id(self):
-        data = dict(id=257, year=2015)
+        data = dict(car_id=257, year=2015)
         res = self.client.post('/car/update', data=json.dumps(data), content_type='application/json')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
@@ -141,13 +141,13 @@ class CarTestCase(unittest.TestCase):
         res = self.client.post('/car/update', data=json.dumps(data), content_type='application/json')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
-        self.assertEqual(json_response['response'], "Missing ID parameter")
+        self.assertEqual(json_response['response'], "Missing car ID parameter")
 
-        data = dict(id="kawabanga!", model="C45 AMG")
+        data = dict(car_id="kawabanga!", model="C45 AMG")
         res = self.client.post('/car/update', data=json.dumps(data), content_type='application/json')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
-        self.assertEqual(json_response['response'], "Invalid ID parameter")
+        self.assertEqual(json_response['response'], "Invalid car ID parameter")
 
     def test_can_delete_car(self):
         pass
