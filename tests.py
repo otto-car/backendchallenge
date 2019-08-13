@@ -395,6 +395,40 @@ class BranchTestCase(unittest.TestCase):
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], "Invalid branch ID")
 
+    def test_can_delete_branch(self):
+        """ Test can delete branch """
+        data = dict(city="London", postcode="E1W 3SS", capacity=5)
+        api_call(self, "POST", '/branch/create', data, 200)
+
+        data = dict(branch_id=1)
+        json_response = api_call(self, "DELETE", '/branch/delete', data, 200, True)
+        self.assertEqual(json_response['status'], 200)
+        self.assertEqual(json_response['message'], "Branch deleted")
+
+        data = dict(branch_id=1)
+        json_response = api_call(self, "GET", '/branch/get', data, 200, True)
+        self.assertEqual(json_response['status'], 404)
+        self.assertEqual(json_response['message'], "Branch not found")
+
+    def test_cant_delete_branch_invalid_id(self):
+        """ Test we cant delete branch with invalid ID """
+        data = dict(branch_id=102030)
+        json_response = api_call(self, "DELETE", '/branch/delete', data, 200, True)
+        self.assertEqual(json_response['status'], 404)
+        self.assertEqual(json_response['message'], "Branch not found")
+
+        data = dict(branch_id="i_love_sushi")
+        json_response = api_call(self, "DELETE", '/branch/delete', data, 200, True)
+        self.assertEqual(json_response['status'], 400)
+        self.assertEqual(json_response['message'], "Invalid branch ID")
+
+    def test_cant_delete_branch_invalid_request(self):
+        """ Test we can't delete branch with bad request"""
+        data = dict()
+        json_response = api_call(self, "DELETE", '/branch/delete', data, 200, True)
+        self.assertEqual(json_response['status'], 400)
+        self.assertEqual(json_response['message'], 'Missing branch ID')
+
     def tearDown(self):
         with self.app.app_context():
             # drop all tables
