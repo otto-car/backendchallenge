@@ -88,7 +88,8 @@ class CarTestCase(unittest.TestCase):
         res = self.client.get('/car/get')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
-        self.assertEqual(json_response['response'], 'Missing car ID parameter')
+        self.assertEqual(json_response['status'], 400)
+        self.assertEqual(json_response['message'], 'Missing car ID')
 
     def test_cant_get_car_missing_params(self):
         """ Test that endpoint can deal with empty param"""
@@ -96,13 +97,15 @@ class CarTestCase(unittest.TestCase):
         res = self.client.get('/car/get', query_string=data, content_type='application/json')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
-        self.assertEqual(json_response['response'], 'Missing car ID parameter')
+        self.assertEqual(json_response['status'], 400)
+        self.assertEqual(json_response['message'], 'Missing car ID')
 
         data = dict(car_id=None)
         res = self.client.get('/car/get', query_string=data, content_type='application/json')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
-        self.assertEqual(json_response['response'], 'Missing car ID parameter')
+        self.assertEqual(json_response['status'], 400)
+        self.assertEqual(json_response['message'], 'Missing car ID')
 
     def test_cant_get_car_id_doesnt_exist(self):
         """ Test can't get car ID that doesn't exist"""
@@ -110,7 +113,8 @@ class CarTestCase(unittest.TestCase):
         res = self.client.get('/car/get', query_string=data, content_type='application/json')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
-        self.assertEqual(json_response['response'], "Car doesn't exist")
+        self.assertEqual(json_response['status'], 404)
+        self.assertEqual(json_response['message'], "Car not found")
 
     def test_cant_get_car_id_has_to_be_int(self):
         """ Test can't get a car with invalid car ID """
@@ -118,7 +122,8 @@ class CarTestCase(unittest.TestCase):
         res = self.client.get('/car/get', query_string=data, content_type='application/json')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
-        self.assertEqual(json_response['response'], "Invalid car ID parameter")
+        self.assertEqual(json_response['status'], 400)
+        self.assertEqual(json_response['message'], "Invalid car ID")
 
     def test_can_update_car(self):
         """ Test for updating car details"""
@@ -185,7 +190,8 @@ class CarTestCase(unittest.TestCase):
         res = self.client.get('/car/get', query_string=data, content_type='application/json')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
-        self.assertEqual(json_response['response'], "Car doesn't exist")
+        self.assertEqual(json_response['status'], 404)
+        self.assertEqual(json_response['message'], "Car not found")
 
     def test_cant_delete_car_invalid_id(self):
         """ Test we cant delete car with invalid ID """
