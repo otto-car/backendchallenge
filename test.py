@@ -175,7 +175,8 @@ class CarTestCase(unittest.TestCase):
         res = self.client.delete('/car/delete', query_string=data, content_type='application/json')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
-        self.assertEqual(json_response['response'], 'Car deleted')
+        self.assertEqual(json_response['status'], 200)
+        self.assertEqual(json_response['message'], "Car deleted")
 
         data = dict(car_id=1)
         res = self.client.get('/car/get', query_string=data, content_type='application/json')
@@ -189,13 +190,15 @@ class CarTestCase(unittest.TestCase):
         res = self.client.delete('/car/delete', query_string=data, content_type='application/json')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
-        self.assertEqual(json_response['response'], "Car doesn't exist")
+        self.assertEqual(json_response['status'], 404)
+        self.assertEqual(json_response['message'], "Car is not found")
 
         data = dict(car_id="i_love_pizza")
         res = self.client.delete('/car/delete', query_string=data, content_type='application/json')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
-        self.assertEqual(json_response['response'], 'Invalid car ID parameter')
+        self.assertEqual(json_response['status'], 400)
+        self.assertEqual(json_response['message'], "Invalid car ID")
 
     def test_cant_delete_car_invalid_request(self):
         """ Test we can't delete car with bad request"""
@@ -203,7 +206,8 @@ class CarTestCase(unittest.TestCase):
         res = self.client.delete('/car/delete', data=data, content_type='application/json')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
-        self.assertEqual(json_response['response'], 'Missing car ID parameter')
+        self.assertEqual(json_response['status'], 400)
+        self.assertEqual(json_response['message'], 'Missing car ID')
 
     def test_can_assign_car_to_driver(self):
         pass
