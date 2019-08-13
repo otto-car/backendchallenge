@@ -9,9 +9,9 @@ def api_call(self, method, url, data, status_code, return_jason=False):
     elif method == "GET":
         res = self.client.get(url, query_string=data, content_type='application/json')
     elif method == "DELETE":
-        pass
+        res = self.client.delete(url, query_string=data, content_type='application/json')
     elif method == "PUT":
-        pass
+        res = self.client.put(url, data=json.dumps(data), content_type='application/json')
     else:
         return False
 
@@ -135,7 +135,7 @@ class CarTestCase(unittest.TestCase):
         api_call(self, "POST", '/car/create', data, 200)
 
         data = dict(car_id=1, model="Model X")
-        res = self.client.post('/car/update', data=json.dumps(data), content_type='application/json')
+        res = self.client.put('/car/update', data=json.dumps(data), content_type='application/json')
         self.assertEqual(res.status_code, 200)
 
         data = dict(car_id=1)
@@ -145,7 +145,7 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response['model'], 'Model X')
 
         data = dict(car_id=1, model="545i", year=2015)
-        res = self.client.post('/car/update', data=json.dumps(data), content_type='application/json')
+        res = self.client.put('/car/update', data=json.dumps(data), content_type='application/json')
         self.assertEqual(res.status_code, 200)
 
         data = dict(car_id=1)
@@ -156,25 +156,19 @@ class CarTestCase(unittest.TestCase):
     def test_cant_update_car_invalid_id(self):
         """ Test that cant update car with ID taht doesn't exist"""
         data = dict(car_id=257, year=2015)
-        res = self.client.post('/car/update', data=json.dumps(data), content_type='application/json')
-        self.assertEqual(res.status_code, 200)
-        json_response = res.get_json()
+        json_response = api_call(self, "PUT", '/car/update', data, 200, True)
         self.assertEqual(json_response['status'], 404)
         self.assertEqual(json_response['message'], "Car not found")
 
     def test_cant_update_car_invalid_parameters(self):
         """ Test can't update car with wrong or missing ID"""
         data = dict(year=2018, make="Ford")
-        res = self.client.post('/car/update', data=json.dumps(data), content_type='application/json')
-        self.assertEqual(res.status_code, 200)
-        json_response = res.get_json()
+        json_response = api_call(self, "PUT", '/car/update', data, 200, True)
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], "Missing car ID")
 
         data = dict(car_id="cowabunga!", model="C45 AMG")
-        res = self.client.post('/car/update', data=json.dumps(data), content_type='application/json')
-        self.assertEqual(res.status_code, 200)
-        json_response = res.get_json()
+        json_response = api_call(self, "PUT", '/car/update', data, 200, True)
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], "Invalid car ID")
 
@@ -184,9 +178,7 @@ class CarTestCase(unittest.TestCase):
         api_call(self, "POST", '/car/create', data, 200)
 
         data = dict(car_id=1)
-        res = self.client.delete('/car/delete', query_string=data, content_type='application/json')
-        self.assertEqual(res.status_code, 200)
-        json_response = res.get_json()
+        json_response = api_call(self, "DELETE", '/car/delete', data, 200, True)
         self.assertEqual(json_response['status'], 200)
         self.assertEqual(json_response['message'], "Car deleted")
 
@@ -198,25 +190,19 @@ class CarTestCase(unittest.TestCase):
     def test_cant_delete_car_invalid_id(self):
         """ Test we cant delete car with invalid ID """
         data = dict(car_id=102030)
-        res = self.client.delete('/car/delete', query_string=data, content_type='application/json')
-        self.assertEqual(res.status_code, 200)
-        json_response = res.get_json()
+        json_response = api_call(self, "DELETE", '/car/delete', data, 200, True)
         self.assertEqual(json_response['status'], 404)
         self.assertEqual(json_response['message'], "Car not found")
 
         data = dict(car_id="i_love_pizza")
-        res = self.client.delete('/car/delete', query_string=data, content_type='application/json')
-        self.assertEqual(res.status_code, 200)
-        json_response = res.get_json()
+        json_response = api_call(self, "DELETE", '/car/delete', data, 200, True)
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], "Invalid car ID")
 
     def test_cant_delete_car_invalid_request(self):
         """ Test we can't delete car with bad request"""
         data = dict()
-        res = self.client.delete('/car/delete', data=data, content_type='application/json')
-        self.assertEqual(res.status_code, 200)
-        json_response = res.get_json()
+        json_response = api_call(self, "DELETE", '/car/delete', data, 200, True)
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], 'Missing car ID')
 

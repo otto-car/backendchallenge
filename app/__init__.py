@@ -100,9 +100,9 @@ def create_app(config_name):
 
             return jsonify(car.serialize())
 
-    @app.route('/car/update', methods=['POST'])
+    @app.route('/car/update', methods=['PUT'])
     def car_update():
-        if request.method == "POST":
+        if request.method == "PUT":
             request_data = request.get_json(force=True)
 
             if "car_id" not in request_data.keys():
