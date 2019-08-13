@@ -16,6 +16,9 @@ flask flask-sqlalchemy psycopg2 flask-migrate flask-script
 ## Set Up User
 ## Create Database
 ## Migrate Database
+python manage.py db init
+python manage.py db migrate
+python manage.py db upgrade 
 
 # Running the app
 source environment.env + flask run
