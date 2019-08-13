@@ -110,7 +110,44 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response['response'], "Invalid car ID parameter")
 
     def test_can_update_car(self):
-        pass
+        data = dict(id=1, model="Model X")
+        res = self.client.post('/car/update', data=json.dumps(data), content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        data = dict(car_id=1)
+        res = self.client.get('/car/get', query_string=data, content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        json_response = res.get_json()
+        self.assertEqual(json_response['model'], 'Model X')
+
+        data = dict(id=2, model="545i", year=2015)
+        res = self.client.post('/car/update', data=json.dumps(data), content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        data = dict(car_id=2)
+        res = self.client.get('/car/get', query_string=data, content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        json_response = res.get_json()
+        self.assertEqual(json_response['model'], '545i')
+        self.assertEqual(json_response['year'], 2015)
+
+    def test_cant_update_car_invalid_id(self):
+        data = dict(id=257, year=2015)
+        res = self.client.post('/car/update', data=json.dumps(data), content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        json_response = res.get_json()
+        self.assertEqual(json_response['response'], "Couldn't update car: ID doesn't exist")
+
+    def test_cant_update_car_invalid_parameters(self):
+        data = dict(year=2018, make="Ford")
+        res = self.client.post('/car/update', data=json.dumps(data), content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        json_response = res.get_json()
+        self.assertEqual(json_response['response'], "Missing ID parameter")
+
+        data = dict(id="kawabanga!", model="C45 AMG")
+        res = self.client.post('/car/update', data=json.dumps(data), content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        json_response = res.get_json()
+        self.assertEqual(json_response['response'], "Invalid ID parameter")
 
     def test_can_delete_car(self):
         pass
