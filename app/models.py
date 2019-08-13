@@ -61,11 +61,11 @@ class Branch(db.Model):
         db.session.commit()
 
     def get(branch_id):
-        return db.session.query(Branch).filter(Car.id == branch_id).first()
+        return db.session.query(Branch).filter(Branch.id == branch_id).first()
 
     def serialize(self):
         return {
-            "city": self.make,
-            "postcode": self.model,
-            "capacity": self.year,
+            "city": self.city,
+            "postcode": self.postcode,
+            "capacity": self.capacity,
         }
