@@ -124,21 +124,31 @@ def create_app(config_name):
         if request.method == "DELETE":
 
             if not "car_id" in request.args:
-                return jsonify({"response": "Missing car ID parameter"})
+                return jsonify({
+                    "status": 400,
+                    "message": "Missing car ID"
+                })
 
             car_id = request.args.get("car_id")
 
             try:
                 int(car_id)
             except:
-                return jsonify({"response": "Invalid car ID parameter"})
-
+                return jsonify({
+                    "status": 400,
+                    "message": "Invalid car ID"
+                })
             car = Car.get(car_id)
             if not car:
-                return jsonify({"response": "Car doesn't exist"})
-
+                return jsonify({
+                    "status": 404,
+                    "message": "Car is not found"
+                })
             car.delete()
 
-            return jsonify({"response": "Car deleted"})
+            return jsonify({
+                "status": 200,
+                "message": "Car deleted"
+            })
 
     return app
