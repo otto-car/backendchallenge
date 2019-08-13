@@ -167,7 +167,43 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response['response'], "Invalid car ID parameter")
 
     def test_can_delete_car(self):
-        pass
+        """ Test can delete car """
+        data = dict(make="Tesla", model="Model 3", year=2015)
+        self.client.post('/car/create', data=json.dumps(data), content_type='application/json')
+
+        data = dict(car_id=1)
+        res = self.client.delete('/car/delete', query_string=data, content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        json_response = res.get_json()
+        self.assertEqual(json_response['response'], 'Car deleted')
+
+        data = dict(car_id=1)
+        res = self.client.delete('/car/get', query_string=data, content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        json_response = res.get_json()
+        self.assertEqual(json_response['response'], "Car doesn't exist")
+
+    def test_cant_delete_car_invalid_id(self):
+        """ Test we cant delete car with invalid ID """
+        data = dict(car_id=102030)
+        res = self.client.delete('/car/delete', query_string=data, content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        json_response = res.get_json()
+        self.assertEqual(json_response['response'], 'Invalid car ID')
+
+        data = dict(car_id="i_love_pizza")
+        res = self.client.delete('/car/delete', query_string=data, content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        json_response = res.get_json()
+        self.assertEqual(json_response['response'], 'Invalid car ID')
+
+    def test_cant_delete_car_invalid_request(self):
+        """ Test we can't delete car with bad request"""
+        data = dict()
+        res = self.client.delete('/car/delete', query_string=data, content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        json_response = res.get_json()
+        self.assertEqual(json_response['response'], 'Missing car ID')
 
     def test_can_assign_car_to_driver(self):
         pass
