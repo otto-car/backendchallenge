@@ -5,8 +5,8 @@ class Car(db.Model):
     __tablename__ = 'car'
 
     id = db.Column(db.Integer, primary_key=True)
-    make = db.Column(db.String(255))
-    model = db.Column(db.String(255))
+    make = db.Column(db.String(100))
+    model = db.Column(db.String(100))
     year = db.Column(db.Integer())
     assigned_type = db.Column(db.Integer(), nullable=True)
     assigned_id = db.Column(db.Integer(), nullable=True)
