@@ -101,5 +101,8 @@ def create_app(config_name):
             except:
                 return jsonify({"response": "Invalid car ID parameter"})
 
+            car = Car.get(car_id)
+            if not car:
+                return jsonify({"response": "Couldn't update car: ID doesn't exist"})
             return jsonify({"response": "Car updated"})
     return app
