@@ -29,9 +29,6 @@ class Car(db.Model):
     def get(car_id):
         return db.session.query(Car).filter(Car.id == car_id).first()
 
-    def update(self, id, data):
-        return db.session.query(Car).filter_by(id=id).update(data)
-
     def serialize(self):
         return {
             "make": self.make,

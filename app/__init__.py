@@ -22,6 +22,7 @@ def create_app(config_name):
 
             error = False
             message = ""
+
             # Make, model and year are necessary in order to create a car object
             make = ""
             if "make" in request_data.keys():
@@ -85,4 +86,36 @@ def create_app(config_name):
 
             return jsonify(car.serialize())
 
+    @app.route('/car/update', methods=['post'])
+    def car_update():
+        if request.method == "POST":
+            request_data = request.get_json(force=True)
+
+            if "car_id" not in request_data.keys():
+                return jsonify({"response": "Missing car ID parameter"})
+
+            car_id = request_data['car_id']
+
+            try:
+                int(car_id)
+            except:
+                return jsonify({"response": "Invalid car ID parameter"})
+
+            car = Car.get(car_id)
+
+            if not car:
+                return jsonify({"response": "Couldn't update car: ID doesn't exist"})
+
+            if "make" in request_data.keys():
+                car.make = request_data['make']
+
+            if "model" in request_data.keys():
+                car.model = request_data['model']
+
+            if "year" in request_data.keys():
+                car.year = request_data['year']
+
+            car.save()
+
+            return jsonify({"response": "Car record was updated"})
     return app
