@@ -267,4 +267,53 @@ def create_app(config_name):
 
             return jsonify(branch.serialize())
 
+    @app.route('/branch/update', methods=['PUT'])
+    def branch_update():
+        if request.method == "PUT":
+            request_data = request.get_json(force=True)
+
+            if "branch_id" not in request_data.keys():
+                return jsonify({
+                    "status": 400,
+                    "message": "Missing branch ID"
+                })
+
+            branch_id = request_data['branch_id']
+
+            try:
+                int(branch_id)
+            except:
+                return jsonify({
+                    "status": 400,
+                    "message": "Invalid branch ID"
+                })
+
+            branch = Branch.get(branch_id)
+
+            if not branch:
+                return jsonify({
+                    "status": 404,
+                    "message": "Branch not found"
+                })
+
+            if "city" in request_data.keys():
+                branch.city = request_data['city']
+
+            if "postcode" in request_data.keys():
+                branch.postcode = request_data['postcode']
+
+            if "capacity" in request_data.keys():
+                try:
+                    int(request_data['capacity'])
+                    branch.capacity = request_data['capacity']
+                except:
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid capacity"
+                    })
+
+            branch.save()
+
+            return jsonify({"response": "Branch record was updated"})
+
     return app
