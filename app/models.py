@@ -96,5 +96,5 @@ class Driver(db.Model):
     def serialize(self):
         return {
             "name": self.name,
-            "dob": self.dob
+            "dob": self.dob.strftime('%d/%m/%Y')
         }

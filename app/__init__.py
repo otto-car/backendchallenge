@@ -3,12 +3,14 @@ from flask_sqlalchemy import SQLAlchemy
 from instance.config import app_config
 from flask import request, jsonify, abort
 import re
+import datetime
+from datetime import date
 
 db = SQLAlchemy()
 
 
 def create_app(config_name):
-    from app.models import Car, Branch
+    from app.models import Car, Branch, Driver
 
     app = FlaskAPI(__name__, instance_relative_config=True)
     app.config.from_object(app_config[config_name])
@@ -349,6 +351,170 @@ def create_app(config_name):
             return jsonify({
                 "status": 200,
                 "message": "Branch deleted"
+            })
+
+    @app.route('/driver/create', methods=['POST'])
+    def driver_create():
+        if request.method == "POST":
+            request_data = request.get_json(force=True)
+
+            # Make, model and year are necessary in order to create a car object
+            if "name" in request_data.keys():
+                name = request_data['name']
+            else:
+                return jsonify({
+                    "status": 400,
+                    "message": "Missing name"
+                })
+
+            if "dob" in request_data.keys():
+                try:
+                    dob = datetime.datetime.strptime(request_data['dob'], '%d/%m/%Y')
+
+                    # Won't let drivers below age 18 to join
+                    min_age = datetime.timedelta(weeks=52 * 18)
+                    if datetime.datetime.now() - dob < min_age:
+                        return jsonify({
+                            "status": 400,
+                            "message": "Invalid DOB"
+                        })
+
+                    dob = dob.strftime("%m/%d/%Y")
+
+                except:
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid DOB"
+                    })
+            else:
+                return jsonify({
+                    "status": 400,
+                    "message": "Missing DOB"
+                })
+
+            driver = Driver(name, dob)
+            driver.save()
+            return jsonify({
+                "status": 201,
+                "message": "Driver created"}
+            )
+
+    @app.route('/driver/get', methods=['GET'])
+    def driver_get():
+        if request.method == "GET":
+            driver_id = request.args.get('driver_id')
+
+            if not driver_id:
+                return jsonify({
+                    "status": 400,
+                    "message": "Missing driver ID"
+                })
+            try:
+                int(driver_id)
+            except:
+                return jsonify({
+                    "status": 400,
+                    "message": "Invalid driver ID"
+                })
+
+            driver = Driver.get(driver_id)
+            if not driver:
+                return jsonify({
+                    "status": 404,
+                    "message": "Driver not found"
+                })
+
+            return jsonify(driver.serialize())
+
+    @app.route('/driver/update', methods=['PUT'])
+    def driver_update():
+        if request.method == "PUT":
+            request_data = request.get_json(force=True)
+
+            if "driver_id" not in request_data.keys():
+                return jsonify({
+                    "status": 400,
+                    "message": "Missing driver ID"
+                })
+
+            driver_id = request_data['driver_id']
+
+            try:
+                int(driver_id)
+            except:
+                return jsonify({
+                    "status": 400,
+                    "message": "Invalid driver ID"
+                })
+
+            driver = Driver.get(driver_id)
+
+            if not driver:
+                return jsonify({
+                    "status": 404,
+                    "message": "Driver not found"
+                })
+
+            if "name" in request_data.keys():
+                driver.name = request_data['name']
+
+            if "dob" in request_data.keys():
+                try:
+                    dob = datetime.datetime.strptime(request_data['dob'], '%d/%m/%Y')
+
+                    # Won't let drivers below age 18 to join
+                    min_age = datetime.timedelta(weeks=52 * 18)
+                    if datetime.datetime.now() - dob < min_age:
+                        return jsonify({
+                            "status": 400,
+                            "message": "Invalid DOB"
+                        })
+
+                    driver.dob = request_data['dob']
+
+                except:
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid DOB"
+                    })
+
+            driver.save()
+
+            return jsonify({"response": "Driver record was updated"})
+
+    @app.route('/driver/delete', methods=['DELETE'])
+    def driver_delete():
+        if request.method == "DELETE":
+
+            if not "driver_id" in request.args:
+                return jsonify({
+                    "status": 400,
+                    "message": "Missing driver ID"
+                })
+
+            driver_id = request.args.get("driver_id")
+
+            try:
+                int(driver_id)
+            except:
+                return jsonify({
+                    "status": 400,
+                    "message": "Invalid driver ID"
+                })
+
+            driver = Driver.get(driver_id)
+
+            if not driver:
+                return jsonify({
+                    "status": 404,
+                    "message": "Driver not found"
+                })
+
+            driver.delete()
+
+            return jsonify({
+                "status": 200,
+                "message": "Driver deleted"
             })
 
     return app
