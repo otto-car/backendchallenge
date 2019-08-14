@@ -98,8 +98,11 @@ class Driver(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    def get(driver_id):
-        return db.session.query(Driver).filter(Driver.id == driver_id).first()
+    def get(params):
+        query = db.session.query(Driver)
+        for attr, value in params.items():
+            query = query.filter(getattr(Driver, attr) == value)
+        return db.session.query(Driver).first()
 
     def serialize(self):
         return {

@@ -366,6 +366,7 @@ def create_app(config_name):
                     })
 
                 params["postcode"] = postcode
+
             if not params:
                 return jsonify({
                     "status": 400,
@@ -554,22 +555,42 @@ def create_app(config_name):
     @app.route('/driver/get', methods=['GET'])
     def driver_get():
         if request.method == "GET":
-            driver_id = request.args.get('driver_id')
-
-            if not driver_id:
+            if request.args is None:
                 return jsonify({
                     "status": 400,
-                    "message": "Missing driver ID"
-                })
-            try:
-                int(driver_id)
-            except:
-                return jsonify({
-                    "status": 400,
-                    "message": "Invalid driver ID"
+                    "message": "Invalid request"
                 })
 
-            driver = Driver.get(driver_id)
+            params = {}
+
+            if "id" in request.args.keys():
+                id = request.args.get('id')
+
+                try:
+                    int(id)
+                except:
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid ID"
+                    })
+
+                params['id'] = id
+
+            if "name" in request.args.keys():
+                params["name"] = request.args.get('name')
+
+            if "dob" in request.args.keys():
+                dob = datetime.datetime.strptime(request.args.get('dob'), '%d/%m/%Y')
+                params["dob"] = dob.strftime("%m/%d/%Y")
+
+            if not params:
+                return jsonify({
+                    "status": 400,
+                    "message": "Invalid request"
+                })
+
+            driver = Driver.get(params)
+
             if not driver:
                 return jsonify({
                     "status": 404,
@@ -589,23 +610,24 @@ def create_app(config_name):
                     "message": "Invalid request"
                 })
 
-            if "driver_id" not in request_data.keys():
+            if "id" not in request_data.keys():
                 return jsonify({
                     "status": 400,
-                    "message": "Missing driver ID"
+                    "message": "Missing ID"
                 })
 
-            driver_id = request_data['driver_id']
+            id = request_data['id']
 
             try:
-                int(driver_id)
+                int(id)
             except:
                 return jsonify({
                     "status": 400,
-                    "message": "Invalid driver ID"
+                    "message": "Invalid ID"
                 })
 
-            driver = Driver.get(driver_id)
+            params = {"id": id}
+            driver = Driver.get(params)
 
             if not driver:
                 return jsonify({
@@ -653,23 +675,24 @@ def create_app(config_name):
     def driver_delete():
         if request.method == "DELETE":
 
-            if not "driver_id" in request.args:
+            if not "id" in request.args:
                 return jsonify({
                     "status": 400,
                     "message": "Missing driver ID"
                 })
 
-            driver_id = request.args.get("driver_id")
+            id = request.args.get("id")
 
             try:
-                int(driver_id)
+                int(id)
             except:
                 return jsonify({
                     "status": 400,
                     "message": "Invalid driver ID"
                 })
 
-            driver = Driver.get(driver_id)
+            params = {"id": id}
+            driver = Driver.get(params)
 
             if not driver:
                 return jsonify({

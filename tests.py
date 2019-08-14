@@ -600,7 +600,7 @@ class DriverTestCase(unittest.TestCase):
         data = dict(name="Andrej Lukasov", dob="25/02/1990")
         api_call(self, "POST", '/driver/create', data, 200)
 
-        data = dict(driver_id=1)
+        data = dict(id=1)
         json_response = api_call(self, "GET", '/driver/get', data, 200, True)
         self.assertEqual(json_response['name'], 'Andrej Lukasov')
         self.assertEqual(json_response['dob'], '25/02/1990')
@@ -620,54 +620,54 @@ class DriverTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
         self.assertEqual(json_response['status'], 400)
-        self.assertEqual(json_response['message'], 'Missing driver ID')
+        self.assertEqual(json_response['message'], 'Invalid request')
 
     def test_cant_get_driver_missing_params(self):
         """ Test that endpoint can deal with empty param"""
         data = dict()
         json_response = api_call(self, "GET", '/driver/get', data, 200, True)
         self.assertEqual(json_response['status'], 400)
-        self.assertEqual(json_response['message'], 'Missing driver ID')
+        self.assertEqual(json_response['message'], 'Invalid request')
 
-        data = dict(driver_id=None)
+        data = dict(id=None)
         json_response = api_call(self, "GET", '/driver/get', data, 200, True)
         self.assertEqual(json_response['status'], 400)
-        self.assertEqual(json_response['message'], 'Missing driver ID')
+        self.assertEqual(json_response['message'], 'Invalid request')
 
     def test_cant_get_driver_id_doesnt_exist(self):
         """ Test can't get driver ID that doesn't exist"""
-        data = dict(driver_id=100)
+        data = dict(id=100)
         json_response = api_call(self, "GET", '/driver/get', data, 200, True)
         self.assertEqual(json_response['status'], 404)
         self.assertEqual(json_response['message'], "Driver not found")
 
     def test_cant_get_driver_id_has_to_be_int(self):
         """ Test can't get a driver with invalid driver ID """
-        data = dict(driver_id="abcd")
+        data = dict(id="abcd")
         json_response = api_call(self, "GET", '/driver/get', data, 200, True)
         self.assertEqual(json_response['status'], 400)
-        self.assertEqual(json_response['message'], "Invalid driver ID")
+        self.assertEqual(json_response['message'], "Invalid ID")
 
     def test_can_update_driver(self):
         """ Test for updating driver details"""
         data = dict(name="Nicola Tesla", dob="07/11/1952")
         api_call(self, "POST", '/driver/create', data, 200)
 
-        data = dict(driver_id=1, name="John Malkovich")
+        data = dict(id=1, name="John Malkovich")
         json_response = api_call(self, "PUT", '/driver/update', data, 200, True)
         self.assertEqual(json_response['status'], 200)
         self.assertEqual(json_response['message'], "Driver record was updated")
 
-        data = dict(driver_id=1)
+        data = dict(id=1)
         json_response = api_call(self, "GET", '/driver/get', data, 200, True)
         self.assertEqual(json_response['name'], 'John Malkovich')
 
-        data = dict(driver_id=1, name="Tesla Nicola", dob="12/12/2000")
+        data = dict(id=1, name="Tesla Nicola", dob="12/12/2000")
         json_response = api_call(self, "PUT", '/driver/update', data, 200, True)
         self.assertEqual(json_response['status'], 200)
         self.assertEqual(json_response['message'], "Driver record was updated")
 
-        data = dict(driver_id=1)
+        data = dict(id=1)
         json_response = api_call(self, "GET", '/driver/get', data, 200, True)
         self.assertEqual(json_response['name'], 'Tesla Nicola')
         self.assertEqual(json_response['dob'], "12/12/2000")
@@ -688,7 +688,7 @@ class DriverTestCase(unittest.TestCase):
 
     def test_cant_update_driver_invalid_id(self):
         """ Test that cant update driver with ID taht doesn't exist"""
-        data = dict(driver_id=257, dob="07/02/1975")
+        data = dict(id=257, dob="07/02/1975")
         json_response = api_call(self, "PUT", '/driver/update', data, 200, True)
         self.assertEqual(json_response['status'], 404)
         self.assertEqual(json_response['message'], "Driver not found")
@@ -698,36 +698,36 @@ class DriverTestCase(unittest.TestCase):
         data = dict(name="Henry Ford")
         json_response = api_call(self, "PUT", '/driver/update', data, 200, True)
         self.assertEqual(json_response['status'], 400)
-        self.assertEqual(json_response['message'], "Missing driver ID")
+        self.assertEqual(json_response['message'], "Missing ID")
 
-        data = dict(driver_id="cowabunga!", name="Eminem McRapburger")
+        data = dict(id="cowabunga!", name="Eminem McRapburger")
         json_response = api_call(self, "PUT", '/driver/update', data, 200, True)
         self.assertEqual(json_response['status'], 400)
-        self.assertEqual(json_response['message'], "Invalid driver ID")
+        self.assertEqual(json_response['message'], "Invalid ID")
 
     def test_can_delete_driver(self):
         """ Test can delete driver """
         data = dict(name="Nicola Tesla", dob="23/12/1983")
         api_call(self, "POST", '/driver/create', data, 200)
 
-        data = dict(driver_id=1)
+        data = dict(id=1)
         json_response = api_call(self, "DELETE", '/driver/delete', data, 200, True)
         self.assertEqual(json_response['status'], 200)
         self.assertEqual(json_response['message'], "Driver deleted")
 
-        data = dict(driver_id=1)
+        data = dict(id=1)
         json_response = api_call(self, "GET", '/driver/get', data, 200, True)
         self.assertEqual(json_response['status'], 404)
         self.assertEqual(json_response['message'], "Driver not found")
 
     def test_cant_delete_driver_invalid_id(self):
         """ Test we cant delete driver with invalid ID """
-        data = dict(driver_id=102030)
+        data = dict(id=102030)
         json_response = api_call(self, "DELETE", '/driver/delete', data, 200, True)
         self.assertEqual(json_response['status'], 404)
         self.assertEqual(json_response['message'], "Driver not found")
 
-        data = dict(driver_id="i_love_pizza")
+        data = dict(id="i_love_pizza")
         json_response = api_call(self, "DELETE", '/driver/delete', data, 200, True)
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], "Invalid driver ID")
