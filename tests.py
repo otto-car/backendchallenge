@@ -253,9 +253,11 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 405)
 
     def test_cant_assign_invalid_requests(self):
-        """" Test for correct method to be used when sending update requests"""
-        res = self.client.post('/car/assign')
-        self.assertEqual(res.status_code, 400)
+        """" Test for correct method to be used when sending assign requests"""
+        data = dict()
+        json_response = api_call(self, "POST", '/car/assign', data, 200, True)
+        self.assertEqual(json_response["status_code"], 400)
+        self.assertEqual(json_response["message"], 'Missing ID')
 
         res = self.client.delete('/car/assign')
         self.assertEqual(res.status_code, 405)

@@ -213,6 +213,22 @@ def create_app(config_name):
                 "message": "Car record was updated"
             })
 
+    @app.route('/car/assign', methods=['POST'])
+    def car_assign():
+        if request.method == "POST":
+
+            if not "id" in request.args:
+                return jsonify({
+                    "status_code": 400,
+                    "message": "Missing ID"
+                })
+            id = request.args.get("id")
+
+            return jsonify({
+                "status_code": 200,
+                "message": "Successfuly assigned a car"
+            })
+
     @app.route('/car/delete', methods=['DELETE'])
     def car_delete():
         if request.method == "DELETE":
