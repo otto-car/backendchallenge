@@ -42,11 +42,8 @@ class CarTestCase(unittest.TestCase):
 
     def test_cant_create_car_invalid_request(self):
         """ Test that API will return 400 (bad request) for invalid requests"""
-        res = self.client.post('/car/create')
-        self.assertEqual(res.status_code, 400)
-
-        res = self.client.post('/car/create', data=None, content_type='application/json')
-        self.assertEqual(res.status_code, 400)
+        json_response = api_call(self, "POST", '/car/create', None, 200)
+        self.assertEqual(json_response, None)
 
         data = dict(make="Tesla", model="Model 3", year="Stringy McStringface")
         json_response = api_call(self, "POST", "/car/create", data, 200, True)
