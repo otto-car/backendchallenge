@@ -25,7 +25,7 @@ def create_app(config_name):
 
             if request_data is None:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Invalid request"
                 })
 
@@ -34,7 +34,7 @@ def create_app(config_name):
                 make = request_data['make']
             else:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Missing make"
                 })
 
@@ -42,7 +42,7 @@ def create_app(config_name):
                 model = request_data['model']
             else:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Missing model"
                 })
 
@@ -51,18 +51,18 @@ def create_app(config_name):
                     int(request_data['year'])
                     if len(str(request_data['year'])) != 4:
                         return jsonify({
-                            "status": 400,
+                            "status_code": 400,
                             "message": "Invalid year"
                         })
                     year = request_data['year']
                 except:
                     return jsonify({
-                        "status": 400,
+                        "status_code": 400,
                         "message": "Invalid year"
                     })
             else:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Missing year"
                 })
 
@@ -76,14 +76,14 @@ def create_app(config_name):
 
             if (assigned_type or assigned_id) and not (assigned_type and assigned_id):
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Both assigned type and id must be present"
                 })
 
             car = Car(make, model, year, assigned_type, assigned_id)
             car.save()
             return jsonify({
-                "status": 201,
+                "status_code": 201,
                 "message": "Car created"}
             )
 
@@ -92,7 +92,7 @@ def create_app(config_name):
         if request.method == "GET":
             if request.args is None:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Invalid request"
                 })
 
@@ -104,7 +104,7 @@ def create_app(config_name):
                     int(id)
                 except:
                     return jsonify({
-                        "status": 400,
+                        "status_code": 400,
                         "message": "Invalid ID"
                     })
 
@@ -122,20 +122,20 @@ def create_app(config_name):
                     int(year)
                     if len(str(year)) != 4:
                         return jsonify({
-                            "status": 400,
+                            "status_code": 400,
                             "message": "Invalid year"
                         })
                     params['year'] = year
                 except:
                     return jsonify({
-                        "status": 400,
+                        "status_code": 400,
                         "message": "Invalid year"
                     })
 
             # check if params are empty
             if not params:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Invalid request"
                 })
 
@@ -143,7 +143,7 @@ def create_app(config_name):
 
             if not car:
                 return jsonify({
-                    "status": 404,
+                    "status_code": 404,
                     "message": "Car not found"
                 })
 
@@ -156,13 +156,13 @@ def create_app(config_name):
 
             if request_data is None:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Invalid request"
                 })
 
             if "id" not in request_data.keys():
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Missing ID"
                 })
 
@@ -172,7 +172,7 @@ def create_app(config_name):
                 int(id)
             except:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Invalid ID"
                 })
             params = {"id": id}
@@ -181,7 +181,7 @@ def create_app(config_name):
 
             if not car:
                 return jsonify({
-                    "status": 404,
+                    "status_code": 404,
                     "message": "Car not found"
                 })
 
@@ -196,20 +196,20 @@ def create_app(config_name):
                     int(request_data['year'])
                     if len(str(request_data['year'])) != 4:
                         return jsonify({
-                            "status": 400,
+                            "status_code": 400,
                             "message": "Invalid year"
                         })
                     car.year = request_data['year']
                 except:
                     return jsonify({
-                        "status": 400,
+                        "status_code": 400,
                         "message": "Invalid year"
                     })
 
             car.save()
 
             return jsonify({
-                "status": 200,
+                "status_code": 200,
                 "message": "Car record was updated"
             })
 
@@ -219,7 +219,7 @@ def create_app(config_name):
 
             if not "id" in request.args:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Missing ID"
                 })
 
@@ -229,7 +229,7 @@ def create_app(config_name):
                 int(id)
             except:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Invalid ID"
                 })
 
@@ -239,14 +239,14 @@ def create_app(config_name):
 
             if not car:
                 return jsonify({
-                    "status": 404,
+                    "status_code": 404,
                     "message": "Car not found"
                 })
 
             car.delete()
 
             return jsonify({
-                "status": 200,
+                "status_code": 200,
                 "message": "Car deleted"
             })
 
@@ -257,7 +257,7 @@ def create_app(config_name):
 
             if request_data is None:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Invalid request"
                 })
 
@@ -265,12 +265,12 @@ def create_app(config_name):
                 city = request_data['city']
                 if not isinstance(city, str):
                     return jsonify({
-                        "status": 400,
+                        "status_code": 400,
                         "message": "Invalid city"
                     })
             else:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Missing city"
                 })
 
@@ -278,18 +278,18 @@ def create_app(config_name):
                 postcode = str(request_data['postcode'])
                 if len(postcode) > 8:
                     return jsonify({
-                        "status": 400,
+                        "status_code": 400,
                         "message": "Invalid postcode"
                     })
                 pattern = re.compile(r'\b[A-Z]{1,2}[0-9][A-Z0-9]? [0-9][ABD-HJLNP-UW-Z]{2}\b')
                 if not pattern.match(postcode):
                     return jsonify({
-                        "status": 400,
+                        "status_code": 400,
                         "message": "Invalid postcode"
                     })
             else:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Missing postcode"
                 })
 
@@ -299,19 +299,19 @@ def create_app(config_name):
                     capacity = request_data['capacity']
                 except:
                     return jsonify({
-                        "status": 400,
+                        "status_code": 400,
                         "message": "Invalid capacity"
                     })
             else:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Missing capacity"
                 })
 
             car = Branch(city, postcode, capacity)
             car.save()
             return jsonify({
-                "status": 201,
+                "status_code": 201,
                 "message": "Branch created"}
             )
 
@@ -320,7 +320,7 @@ def create_app(config_name):
         if request.method == "GET":
             if request.args is None:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Invalid request"
                 })
 
@@ -332,7 +332,7 @@ def create_app(config_name):
                     int(id)
                 except:
                     return jsonify({
-                        "status": 400,
+                        "status_code": 400,
                         "message": "Invalid ID"
                     })
 
@@ -343,7 +343,7 @@ def create_app(config_name):
 
                 if not isinstance(city, str):
                     return jsonify({
-                        "status": 400,
+                        "status_code": 400,
                         "message": "Invalid city"
                     })
 
@@ -354,14 +354,14 @@ def create_app(config_name):
 
                 if len(postcode) > 8:
                     return jsonify({
-                        "status": 400,
+                        "status_code": 400,
                         "message": "Invalid postcode"
                     })
 
                 pattern = re.compile(r'\b[A-Z]{1,2}[0-9][A-Z0-9]? [0-9][ABD-HJLNP-UW-Z]{2}\b')
                 if not pattern.match(postcode):
                     return jsonify({
-                        "status": 400,
+                        "status_code": 400,
                         "message": "Invalid postcode"
                     })
 
@@ -369,14 +369,14 @@ def create_app(config_name):
 
             if not params:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Invalid request"
                 })
 
             branch = Branch.get(params)
             if not branch:
                 return jsonify({
-                    "status": 404,
+                    "status_code": 404,
                     "message": "Branch not found"
                 })
 
@@ -389,13 +389,13 @@ def create_app(config_name):
 
             if request_data is None:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Invalid request"
                 })
 
             if "id" not in request_data.keys():
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Missing ID"
                 })
 
@@ -405,7 +405,7 @@ def create_app(config_name):
                 int(id)
             except:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Invalid ID"
                 })
             params = {"id": id}
@@ -413,7 +413,7 @@ def create_app(config_name):
 
             if not branch:
                 return jsonify({
-                    "status": 404,
+                    "status_code": 404,
                     "message": "Branch not found"
                 })
 
@@ -422,7 +422,7 @@ def create_app(config_name):
 
                 if not isinstance(city, str):
                     return jsonify({
-                        "status": 400,
+                        "status_code": 400,
                         "message": "Invalid city"
                     })
 
@@ -432,13 +432,13 @@ def create_app(config_name):
                 postcode = request_data['postcode']
                 if len(postcode) > 8:
                     return jsonify({
-                        "status": 400,
+                        "status_code": 400,
                         "message": "Invalid postcode"
                     })
                 pattern = re.compile(r'\b[A-Z]{1,2}[0-9][A-Z0-9]? [0-9][ABD-HJLNP-UW-Z]{2}\b')
                 if not pattern.match(postcode):
                     return jsonify({
-                        "status": 400,
+                        "status_code": 400,
                         "message": "Invalid postcode"
                     })
                 branch.postcode = request_data['postcode']
@@ -449,14 +449,14 @@ def create_app(config_name):
                     branch.capacity = request_data['capacity']
                 except:
                     return jsonify({
-                        "status": 400,
+                        "status_code": 400,
                         "message": "Invalid capacity"
                     })
 
             branch.save()
 
             return jsonify({
-                "status": 200,
+                "status_code": 200,
                 "message": "Branch record was updated"
             })
 
@@ -466,7 +466,7 @@ def create_app(config_name):
 
             if not "id" in request.args:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Missing ID"
                 })
 
@@ -476,7 +476,7 @@ def create_app(config_name):
                 int(id)
             except:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Invalid ID"
                 })
 
@@ -485,14 +485,14 @@ def create_app(config_name):
 
             if not branch:
                 return jsonify({
-                    "status": 404,
+                    "status_code": 404,
                     "message": "Branch not found"
                 })
 
             branch.delete()
 
             return jsonify({
-                "status": 200,
+                "status_code": 200,
                 "message": "Branch deleted"
             })
 
@@ -503,7 +503,7 @@ def create_app(config_name):
 
             if request_data is None:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Invalid request"
                 })
 
@@ -511,12 +511,12 @@ def create_app(config_name):
                 name = request_data['name']
                 if not isinstance(name, str):
                     return jsonify({
-                        "status": 400,
+                        "status_code": 400,
                         "message": "Invalid name"
                     })
             else:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Missing name"
                 })
 
@@ -528,7 +528,7 @@ def create_app(config_name):
                     min_age = datetime.timedelta(weeks=52 * 18)
                     if datetime.datetime.now() - dob < min_age:
                         return jsonify({
-                            "status": 400,
+                            "status_code": 400,
                             "message": "Invalid DOB"
                         })
 
@@ -536,19 +536,19 @@ def create_app(config_name):
 
                 except:
                     return jsonify({
-                        "status": 400,
+                        "status_code": 400,
                         "message": "Invalid DOB"
                     })
             else:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Missing DOB"
                 })
 
             driver = Driver(name, dob)
             driver.save()
             return jsonify({
-                "status": 201,
+                "status_code": 201,
                 "message": "Driver created"}
             )
 
@@ -557,7 +557,7 @@ def create_app(config_name):
         if request.method == "GET":
             if request.args is None:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Invalid request"
                 })
 
@@ -570,7 +570,7 @@ def create_app(config_name):
                     int(id)
                 except:
                     return jsonify({
-                        "status": 400,
+                        "status_code": 400,
                         "message": "Invalid ID"
                     })
 
@@ -585,7 +585,7 @@ def create_app(config_name):
 
             if not params:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Invalid request"
                 })
 
@@ -593,7 +593,7 @@ def create_app(config_name):
 
             if not driver:
                 return jsonify({
-                    "status": 404,
+                    "status_code": 404,
                     "message": "Driver not found"
                 })
 
@@ -606,13 +606,13 @@ def create_app(config_name):
 
             if request_data is None:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Invalid request"
                 })
 
             if "id" not in request_data.keys():
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Missing ID"
                 })
 
@@ -622,7 +622,7 @@ def create_app(config_name):
                 int(id)
             except:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Invalid ID"
                 })
 
@@ -631,7 +631,7 @@ def create_app(config_name):
 
             if not driver:
                 return jsonify({
-                    "status": 404,
+                    "status_code": 404,
                     "message": "Driver not found"
                 })
 
@@ -639,7 +639,7 @@ def create_app(config_name):
                 name = request_data['name']
                 if not isinstance(name, str):
                     return jsonify({
-                        "status": 400,
+                        "status_code": 400,
                         "message": "Invalid name"
                     })
                 driver.name = name
@@ -652,7 +652,7 @@ def create_app(config_name):
                     min_age = datetime.timedelta(weeks=52 * 18)
                     if datetime.datetime.now() - dob < min_age:
                         return jsonify({
-                            "status": 400,
+                            "status_code": 400,
                             "message": "Invalid DOB"
                         })
 
@@ -660,14 +660,14 @@ def create_app(config_name):
 
                 except:
                     return jsonify({
-                        "status": 400,
+                        "status_code": 400,
                         "message": "Invalid DOB"
                     })
 
             driver.save()
 
             return jsonify({
-                "status": 200,
+                "status_code": 200,
                 "message": "Driver record was updated"
             })
 
@@ -677,7 +677,7 @@ def create_app(config_name):
 
             if not "id" in request.args:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Missing driver ID"
                 })
 
@@ -687,7 +687,7 @@ def create_app(config_name):
                 int(id)
             except:
                 return jsonify({
-                    "status": 400,
+                    "status_code": 400,
                     "message": "Invalid driver ID"
                 })
 
@@ -696,14 +696,14 @@ def create_app(config_name):
 
             if not driver:
                 return jsonify({
-                    "status": 404,
+                    "status_code": 404,
                     "message": "Driver not found"
                 })
 
             driver.delete()
 
             return jsonify({
-                "status": 200,
+                "status_code": 200,
                 "message": "Driver deleted"
             })
 
