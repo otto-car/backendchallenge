@@ -539,6 +539,49 @@ class DriverTestCase(unittest.TestCase):
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], "Invalid driver ID")
 
+    def test_can_update_driver(self):
+        """ Test for updating driver details"""
+        data = dict(name="Nicola Tesla", dob="07/11/1952")
+        api_call(self, "POST", '/driver/create', data, 200)
+
+        data = dict(driver_id=1, name="John Malkovich")
+        res = self.client.put('/driver/update', data=json.dumps(data), content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+
+        data = dict(driver_id=1)
+        res = self.client.get('/driver/get', query_string=data, content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        json_response = res.get_json()
+        self.assertEqual(json_response['name'], 'John Malkovich')
+
+        data = dict(driver_id=1, name="Tesla Nicola", dob="12/12/2000")
+        res = self.client.put('/driver/update', data=json.dumps(data), content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+
+        data = dict(driver_id=1)
+        json_response = api_call(self, "GET", '/driver/get', data, 200, True)
+        self.assertEqual(json_response['name'], 'Tesla Nicola')
+        self.assertEqual(json_response['dob'], "12/12/2000")
+
+    def test_cant_update_driver_invalid_id(self):
+        """ Test that cant update driver with ID taht doesn't exist"""
+        data = dict(driver_id=257, dob="07/02/1975")
+        json_response = api_call(self, "PUT", '/driver/update', data, 200, True)
+        self.assertEqual(json_response['status'], 404)
+        self.assertEqual(json_response['message'], "Driver not found")
+
+    def test_cant_update_driver_invalid_parameters(self):
+        """ Test can't update driver with wrong or missing ID"""
+        data = dict(name="Henry Ford")
+        json_response = api_call(self, "PUT", '/driver/update', data, 200, True)
+        self.assertEqual(json_response['status'], 400)
+        self.assertEqual(json_response['message'], "Missing driver ID")
+
+        data = dict(driver_id="cowabunga!", name="Eminem McRapburger")
+        json_response = api_call(self, "PUT", '/driver/update', data, 200, True)
+        self.assertEqual(json_response['status'], 400)
+        self.assertEqual(json_response['message'], "Invalid driver ID")
+
     def tearDown(self):
         with self.app.app_context():
             # drop all tables
