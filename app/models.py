@@ -1,5 +1,4 @@
 from app import db
-import datetime
 
 
 class Car(db.Model):
