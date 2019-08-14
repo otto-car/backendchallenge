@@ -305,6 +305,18 @@ def create_app(config_name):
                 branch.city = request_data['city']
 
             if "postcode" in request_data.keys():
+                postcode = request_data['postcode']
+                if len(postcode) > 8:
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid postcode"
+                    })
+                pattern = re.compile(r'\b[A-Z]{1,2}[0-9][A-Z0-9]? [0-9][ABD-HJLNP-UW-Z]{2}\b')
+                if not pattern.match(postcode):
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid postcode"
+                    })
                 branch.postcode = request_data['postcode']
 
             if "capacity" in request_data.keys():
