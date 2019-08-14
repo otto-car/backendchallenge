@@ -508,7 +508,7 @@ def create_app(config_name):
                 })
 
             if "first_name" in request_data.keys():
-                first_name = request_data['name']
+                first_name = request_data['first_name']
                 if not isinstance(first_name, str):
                     return jsonify({
                         "status_code": 400,
@@ -663,14 +663,33 @@ def create_app(config_name):
                     "message": "Driver not found"
                 })
 
-            if "name" in request_data.keys():
-                name = request_data['name']
-                if not isinstance(name, str):
+            if "first_name" in request_data.keys():
+                first_name = request_data['first_name']
+                if not isinstance(first_name, str):
                     return jsonify({
                         "status_code": 400,
-                        "message": "Invalid name"
+                        "message": "Invalid first_name"
                     })
-                driver.name = name
+                driver.first_name = first_name
+
+            if "middle_name" in request_data.keys():
+                middle_name = request_data['middle_name']
+                if not isinstance(middle_name, str):
+                    return jsonify({
+                        "status_code": 400,
+                        "message": "Invalid middle_name"
+                    })
+                driver.middle_name = middle_name
+
+            if "last_name" in request_data.keys():
+                last_name = request_data['last_name']
+                if not isinstance(last_name, str):
+                    return jsonify({
+                        "status_code": 400,
+                        "message": "Invalid last_name"
+                    })
+                driver.last_name = last_name
+
 
             if "dob" in request_data.keys():
                 try:
