@@ -26,11 +26,15 @@ class Car(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    def get(car_id):
-        return db.session.query(Car).filter(Car.id == car_id).first()
+    def get(params):
+        query = db.session.query(Car)
+        for attr, value in params.items():
+            query = query.filter(getattr(Car, attr) == value)
+        return db.session.query(Car).first()
 
     def serialize(self):
         return {
+            "id": self.id,
             "make": self.make,
             "model": self.model,
             "year": self.year,
@@ -60,11 +64,15 @@ class Branch(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    def get(branch_id):
-        return db.session.query(Branch).filter(Branch.id == branch_id).first()
+    def get(params):
+        query = db.session.query(Branch)
+        for attr, value in params.items():
+            query = query.filter(getattr(Branch, attr) == value)
+        return db.session.query(Branch).first()
 
     def serialize(self):
         return {
+            "id": self.id,
             "city": self.city,
             "postcode": self.postcode,
             "capacity": self.capacity
@@ -90,11 +98,15 @@ class Driver(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    def get(driver_id):
-        return db.session.query(Driver).filter(Driver.id == driver_id).first()
+    def get(params):
+        query = db.session.query(Driver)
+        for attr, value in params.items():
+            query = query.filter(getattr(Driver, attr) == value)
+        return db.session.query(Driver).first()
 
     def serialize(self):
         return {
+            "id": self.id,
             "name": self.name,
             "dob": self.dob.strftime('%d/%m/%Y')
         }
