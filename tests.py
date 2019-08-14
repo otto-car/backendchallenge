@@ -188,7 +188,7 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 400)
 
         res = self.client.get('/car/update')
-        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.status_code, 405)
 
     def test_cant_update_car_invalid_id(self):
         """ Test that cant update car with ID taht doesn't exist"""
@@ -359,7 +359,6 @@ class BranchTestCase(unittest.TestCase):
         self.assertEqual(json_response['postcode'], 'E1W 3SS')
         self.assertEqual(json_response['capacity'], 5)
 
-
     def test_cant_get_branch_invalid_request(self):
         """ Test that endpoint can deal with missing query string"""
         res = self.client.post('/branch/get')
@@ -435,6 +434,20 @@ class BranchTestCase(unittest.TestCase):
         self.assertEqual(json_response['city'], 'Guildford')
         self.assertEqual(json_response['postcode'], 'GU2 8DJ')
         self.assertEqual(json_response['capacity'], 90)
+
+    def test_cant_update_branch_invalid_requests(self):
+        """" Test for correct method to be used when sending update requests"""
+        res = self.client.post('/branch/update')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.delete('/branch/update')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/branch/update')
+        self.assertEqual(res.status_code, 400)
+
+        res = self.client.get('/branch/update')
+        self.assertEqual(res.status_code, 405)
 
     def test_cant_update_branch_invalid_id(self):
         """ Test that cant update branch with ID that doesn't exist"""
