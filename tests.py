@@ -525,6 +525,20 @@ class DriverTestCase(unittest.TestCase):
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], 'Missing driver ID')
 
+    def test_cant_get_driver_id_doesnt_exist(self):
+        """ Test can't get driver ID that doesn't exist"""
+        data = dict(driver_id=100)
+        json_response = api_call(self, "GET", '/driver/get', data, 200, True)
+        self.assertEqual(json_response['status'], 404)
+        self.assertEqual(json_response['message'], "Driver not found")
+
+    def test_cant_get_driver_id_has_to_be_int(self):
+        """ Test can't get a driver with invalid driver ID """
+        data = dict(driver_id="abcd")
+        json_response = api_call(self, "GET", '/driver/get', data, 200, True)
+        self.assertEqual(json_response['status'], 400)
+        self.assertEqual(json_response['message'], "Invalid driver ID")
+
     def tearDown(self):
         with self.app.app_context():
             # drop all tables
