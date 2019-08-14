@@ -582,6 +582,40 @@ class DriverTestCase(unittest.TestCase):
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], "Invalid driver ID")
 
+    def test_can_delete_driver(self):
+        """ Test can delete driver """
+        data = dict(name="Nicola Tesla", dob="12/23/1983")
+        api_call(self, "POST", '/driver/create', data, 200)
+
+        data = dict(driver_id=1)
+        json_response = api_call(self, "DELETE", '/driver/delete', data, 200, True)
+        self.assertEqual(json_response['status'], 200)
+        self.assertEqual(json_response['message'], "Driver deleted")
+
+        data = dict(driver_id=1)
+        json_response = api_call(self, "GET", '/driver/get', data, 200, True)
+        self.assertEqual(json_response['status'], 404)
+        self.assertEqual(json_response['message'], "Driver not found")
+
+    def test_cant_delete_driver_invalid_id(self):
+        """ Test we cant delete driver with invalid ID """
+        data = dict(driver_id=102030)
+        json_response = api_call(self, "DELETE", '/driver/delete', data, 200, True)
+        self.assertEqual(json_response['status'], 404)
+        self.assertEqual(json_response['message'], "Driver not found")
+
+        data = dict(driver_id="i_love_pizza")
+        json_response = api_call(self, "DELETE", '/driver/delete', data, 200, True)
+        self.assertEqual(json_response['status'], 400)
+        self.assertEqual(json_response['message'], "Invalid driver ID")
+
+    def test_cant_delete_driver_invalid_request(self):
+        """ Test we can't delete driver with bad request"""
+        data = dict()
+        json_response = api_call(self, "DELETE", '/driver/delete', data, 200, True)
+        self.assertEqual(json_response['status'], 400)
+        self.assertEqual(json_response['message'], 'Missing driver ID')
+
     def tearDown(self):
         with self.app.app_context():
             # drop all tables
