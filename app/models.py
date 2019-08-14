@@ -83,11 +83,15 @@ class Driver(db.Model):
     __tablename__ = 'driver'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
+    first_name = db.Column(db.String(100), nullable=False)
+    middle_name = db.Column(db.String(100), nullable=True)
+    last_name = db.Column(db.String(100), nullable=False)
     dob = db.Column(db.Date, nullable=False)
 
-    def __init__(self, name, dob):
-        self.name = name
+    def __init__(self, first_name, middle_name, last_name, dob):
+        self.first_name = first_name
+        self.middle_name = middle_name
+        self.last_name = last_name
         self.dob = dob
 
     def save(self):
@@ -107,6 +111,8 @@ class Driver(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "name": self.name,
+            "first_name": self.first_name,
+            "middle_name": self.middle_name,
+            "last_name": self.last_name,
             "dob": self.dob.strftime('%d/%m/%Y')
         }
