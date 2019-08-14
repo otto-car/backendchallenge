@@ -238,6 +238,13 @@ def create_app(config_name):
                     "message": "Missing assigned_type"
                 })
             assigned_type = request_data["assigned_type"]
+            try:
+                int(assigned_type)
+            except:
+                return jsonify({
+                    "status_code": 400,
+                    "message": "Invalid assigned_type"
+                })
 
             if assigned_type not in (0, 1, 2):
                 return jsonify({
@@ -261,6 +268,13 @@ def create_app(config_name):
                 })
 
             assigned_id = request_data["assigned_id"]
+            try:
+                int(assigned_id)
+            except:
+                return jsonify({
+                    "status_code": 400,
+                    "message": "Invalid assigned_id"
+                })
 
             # type 1 is driver
             if assigned_type == 1:
@@ -283,7 +297,7 @@ def create_app(config_name):
                     occupancy = branch.get_assigned_cars_count()
                     if branch.capacity > occupancy:
                         car.assigned_type = assigned_type
-                        car.assigned_id = branch.id
+                        car.assigned_id = assigned_id
                     else:
                         return jsonify({
                             "status_code": 400,
