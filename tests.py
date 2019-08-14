@@ -362,7 +362,7 @@ class BranchTestCase(unittest.TestCase):
         data = dict(city="London", postcode="E1W 3SS", capacity=5)
         api_call(self, "POST", '/branch/create', data, 200)
 
-        data = dict(branch_id=1)
+        data = dict(id=1)
         json_response = api_call(self, "GET", '/branch/get', data, 200, True)
         self.assertEqual(json_response['city'], 'London')
         self.assertEqual(json_response['postcode'], 'E1W 3SS')
@@ -383,62 +383,62 @@ class BranchTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
         self.assertEqual(json_response['status'], 400)
-        self.assertEqual(json_response['message'], 'Missing branch ID')
+        self.assertEqual(json_response['message'], 'Invalid request')
 
     def test_cant_get_branch_missing_params(self):
         """ Test that endpoint can deal with empty param"""
         data = dict()
         json_response = api_call(self, "GET", '/branch/get', data, 200, True)
         self.assertEqual(json_response['status'], 400)
-        self.assertEqual(json_response['message'], 'Missing branch ID')
+        self.assertEqual(json_response['message'], 'Invalid request')
 
-        data = dict(branch_id=None)
+        data = dict(id=None)
         json_response = api_call(self, "GET", '/branch/get', data, 200, True)
         self.assertEqual(json_response['status'], 400)
-        self.assertEqual(json_response['message'], 'Missing branch ID')
+        self.assertEqual(json_response['message'], 'Invalid request')
 
     def test_cant_get_branch_id_doesnt_exist(self):
         """ Test can't get branch ID that doesn't exist"""
-        data = dict(branch_id=100)
+        data = dict(id=100)
         json_response = api_call(self, "GET", '/branch/get', data, 200, True)
         self.assertEqual(json_response['status'], 404)
         self.assertEqual(json_response['message'], "Branch not found")
 
     def test_cant_get_branch_id_has_to_be_int(self):
         """ Test can't get a branch with invalid ID """
-        data = dict(branch_id="abcd")
+        data = dict(id="abcd")
         json_response = api_call(self, "GET", '/branch/get', data, 200, True)
         self.assertEqual(json_response['status'], 400)
-        self.assertEqual(json_response['message'], "Invalid branch ID")
+        self.assertEqual(json_response['message'], "Invalid ID")
 
     def test_can_update_branch(self):
         """ Test for updating branch details"""
         data = dict(city="London", postcode="E1W 3SS", capacity=5)
         api_call(self, "POST", '/branch/create', data, 200)
 
-        data = dict(branch_id=1)
+        data = dict(id=1)
         json_response = api_call(self, "GET", '/branch/get', data, 200, True)
         self.assertEqual(json_response['city'], 'London')
         self.assertEqual(json_response['postcode'], 'E1W 3SS')
         self.assertEqual(json_response['capacity'], 5)
 
-        data = dict(branch_id=1, city="Guildford", postcode="GU2 8DJ", capacity=100)
+        data = dict(id=1, city="Guildford", postcode="GU2 8DJ", capacity=100)
         json_response = api_call(self, "PUT", '/branch/update', data, 200, True)
         self.assertEqual(json_response['status'], 200)
         self.assertEqual(json_response['message'], "Branch record was updated")
 
-        data = dict(branch_id=1)
+        data = dict(id=1)
         json_response = api_call(self, "GET", '/branch/get', data, 200, True)
         self.assertEqual(json_response['city'], 'Guildford')
         self.assertEqual(json_response['postcode'], 'GU2 8DJ')
         self.assertEqual(json_response['capacity'], 100)
 
-        data = dict(branch_id=1, capacity=90)
+        data = dict(id=1, capacity=90)
         json_response = api_call(self, "PUT", '/branch/update', data, 200, True)
         self.assertEqual(json_response['status'], 200)
         self.assertEqual(json_response['message'], "Branch record was updated")
 
-        data = dict(branch_id=1)
+        data = dict(id=1)
         json_response = api_call(self, "GET", '/branch/get', data, 200, True)
         self.assertEqual(json_response['city'], 'Guildford')
         self.assertEqual(json_response['postcode'], 'GU2 8DJ')
@@ -460,7 +460,7 @@ class BranchTestCase(unittest.TestCase):
 
     def test_cant_update_branch_invalid_id(self):
         """ Test that cant update branch with ID that doesn't exist"""
-        data = dict(branch_id=257, capacity=25)
+        data = dict(id=257, capacity=25)
         json_response = api_call(self, "PUT", '/branch/update', data, 200, True)
         self.assertEqual(json_response['status'], 404)
         self.assertEqual(json_response['message'], "Branch not found")
@@ -472,7 +472,7 @@ class BranchTestCase(unittest.TestCase):
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], "Missing branch ID")
 
-        data = dict(branch_id="xplain_this", capacity=30)
+        data = dict(id="xplain_this", capacity=30)
         json_response = api_call(self, "PUT", '/branch/update', data, 200, True)
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], "Invalid branch ID")
@@ -482,24 +482,24 @@ class BranchTestCase(unittest.TestCase):
         data = dict(city="London", postcode="E1W 3SS", capacity=5)
         api_call(self, "POST", '/branch/create', data, 200)
 
-        data = dict(branch_id=1)
+        data = dict(id=1)
         json_response = api_call(self, "DELETE", '/branch/delete', data, 200, True)
         self.assertEqual(json_response['status'], 200)
         self.assertEqual(json_response['message'], "Branch deleted")
 
-        data = dict(branch_id=1)
+        data = dict(id=1)
         json_response = api_call(self, "GET", '/branch/get', data, 200, True)
         self.assertEqual(json_response['status'], 404)
         self.assertEqual(json_response['message'], "Branch not found")
 
     def test_cant_delete_branch_invalid_id(self):
         """ Test we cant delete branch with invalid ID """
-        data = dict(branch_id=102030)
+        data = dict(id=102030)
         json_response = api_call(self, "DELETE", '/branch/delete', data, 200, True)
         self.assertEqual(json_response['status'], 404)
         self.assertEqual(json_response['message'], "Branch not found")
 
-        data = dict(branch_id="i_love_sushi")
+        data = dict(id="i_love_sushi")
         json_response = api_call(self, "DELETE", '/branch/delete', data, 200, True)
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], "Invalid branch ID")

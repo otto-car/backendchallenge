@@ -64,8 +64,11 @@ class Branch(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    def get(branch_id):
-        return db.session.query(Branch).filter(Branch.id == branch_id).first()
+    def get(params):
+        query = db.session.query(Branch)
+        for attr, value in params.items():
+            query = query.filter(getattr(Branch, attr) == value)
+        return db.session.query(Branch).first()
 
     def serialize(self):
         return {

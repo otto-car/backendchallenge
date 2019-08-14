@@ -108,7 +108,7 @@ def create_app(config_name):
                         "message": "Invalid ID"
                     })
 
-                params['id']= id
+                params['id'] = id
 
             if "make" in request.args.keys():
                 params['make'] = request.args.get('make')
@@ -318,22 +318,61 @@ def create_app(config_name):
     @app.route('/branch/get', methods=['GET'])
     def branch_get():
         if request.method == "GET":
-            branch_id = request.args.get('branch_id')
-
-            if not branch_id:
+            if request.args is None:
                 return jsonify({
                     "status": 400,
-                    "message": "Missing branch ID"
-                })
-            try:
-                int(branch_id)
-            except:
-                return jsonify({
-                    "status": 400,
-                    "message": "Invalid branch ID"
+                    "message": "Invalid request"
                 })
 
-            branch = Branch.get(branch_id)
+            params = {}
+            if "id" in request.args.keys():
+                id = request.args.get('id')
+
+                try:
+                    int(id)
+                except:
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid ID"
+                    })
+
+                params['id'] = id
+
+            if "city" in request.args.keys():
+                city = request.args.get['city']
+
+                if not isinstance(city, str):
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid city"
+                    })
+
+                params['city'] = city
+
+            if "postcode" in request.args.keys():
+                postcode = request.args.get['postcode']
+
+                if len(postcode) > 8:
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid postcode"
+                    })
+
+                pattern = re.compile(r'\b[A-Z]{1,2}[0-9][A-Z0-9]? [0-9][ABD-HJLNP-UW-Z]{2}\b')
+                if not pattern.match(postcode):
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid postcode"
+                    })
+
+                params["postcode"] = postcode
+            if not params:
+                return jsonify({
+                    "status": 400,
+                    "message": "Invalid request"
+                })
+
+            branch = Branch.get(params)
             if not branch:
                 return jsonify({
                     "status": 404,
@@ -353,23 +392,23 @@ def create_app(config_name):
                     "message": "Invalid request"
                 })
 
-            if "branch_id" not in request_data.keys():
+            if "id" not in request_data.keys():
                 return jsonify({
                     "status": 400,
                     "message": "Missing branch ID"
                 })
 
-            branch_id = request_data['branch_id']
+            id = request_data['id']
 
             try:
-                int(branch_id)
+                int(id)
             except:
                 return jsonify({
                     "status": 400,
                     "message": "Invalid branch ID"
                 })
-
-            branch = Branch.get(branch_id)
+            params = {"id": id}
+            branch = Branch.get(params)
 
             if not branch:
                 return jsonify({
@@ -424,23 +463,24 @@ def create_app(config_name):
     def branch_delete():
         if request.method == "DELETE":
 
-            if not "branch_id" in request.args:
+            if not "id" in request.args:
                 return jsonify({
                     "status": 400,
                     "message": "Missing branch ID"
                 })
 
-            branch_id = request.args.get("branch_id")
+            id = request.args.get("id")
 
             try:
-                int(branch_id)
+                int(id)
             except:
                 return jsonify({
                     "status": 400,
                     "message": "Invalid branch ID"
                 })
 
-            branch = Branch.get(branch_id)
+            params = {"id": id}
+            branch = Branch.get(params)
 
             if not branch:
                 return jsonify({
