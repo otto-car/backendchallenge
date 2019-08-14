@@ -109,6 +109,15 @@ class CarTestCase(unittest.TestCase):
 
     def test_cant_get_car_invalid_request(self):
         """ Test that endpoint can deal with missing query string"""
+        res = self.client.post('/car/get')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.delete('/car/get')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/car/get')
+        self.assertEqual(res.status_code, 405)
+
         res = self.client.get('/car/get')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
