@@ -345,8 +345,18 @@ class BranchTestCase(unittest.TestCase):
         self.assertEqual(json_response['postcode'], 'E1W 3SS')
         self.assertEqual(json_response['capacity'], 5)
 
+
     def test_cant_get_branch_invalid_request(self):
         """ Test that endpoint can deal with missing query string"""
+        res = self.client.post('/branch/get')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.delete('/branch/get')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/branch/get')
+        self.assertEqual(res.status_code, 405)
+
         res = self.client.get('/branch/get')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
@@ -552,6 +562,15 @@ class DriverTestCase(unittest.TestCase):
 
     def test_cant_get_driver_invalid_request(self):
         """ Test that endpoint can deal with missing query string"""
+        res = self.client.post('/driver/get')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.delete('/driver/get')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/driver/get')
+        self.assertEqual(res.status_code, 405)
+
         res = self.client.get('/driver/get')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
