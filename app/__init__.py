@@ -49,6 +49,11 @@ def create_app(config_name):
             if "year" in request_data.keys():
                 try:
                     int(request_data['year'])
+                    if len(str(request_data['year'])) != 4:
+                        return jsonify({
+                            "status": 400,
+                            "message": "Invalid year"
+                        })
                     year = request_data['year']
                 except:
                     return jsonify({
@@ -153,6 +158,11 @@ def create_app(config_name):
             if "year" in request_data.keys():
                 try:
                     int(request_data['year'])
+                    if len(str(request_data['year'])) != 4:
+                        return jsonify({
+                            "status": 400,
+                            "message": "Invalid year"
+                        })
                     car.year = request_data['year']
                 except:
                     return jsonify({
@@ -215,6 +225,11 @@ def create_app(config_name):
 
             if "city" in request_data.keys():
                 city = request_data['city']
+                if not isinstance(city, str):
+                    return jsonify({
+                        "status":400,
+                        "message":"Invalid city"
+                    })
             else:
                 return jsonify({
                     "status": 400,
@@ -222,7 +237,7 @@ def create_app(config_name):
                 })
 
             if "postcode" in request_data.keys():
-                postcode = request_data['postcode']
+                postcode = str(request_data['postcode'])
                 if len(postcode) > 8:
                     return jsonify({
                         "status": 400,
