@@ -280,7 +280,7 @@ def create_app(config_name):
                 params = {"id": assigned_id}
                 branch = Branch.get(params)
                 if branch:
-                    occupancy = branch.get_assigned_cars()
+                    occupancy = branch.get_assigned_cars_count()
                     if branch.capacity > occupancy:
                         car.assigned_type = assigned_type
                         car.assigned_id = branch.id
@@ -289,7 +289,7 @@ def create_app(config_name):
 
             return jsonify({
                 "status_code": 200,
-                "message": "Successfuly assigned a car"
+                "message": "Successfully assigned a car"
             })
 
     @app.route('/car/delete', methods=['DELETE'])

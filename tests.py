@@ -297,7 +297,14 @@ class CarTestCase(unittest.TestCase):
         data = dict(id=1, assigned_type=2, assigned_id=1)
         json_response = api_call(self, "POST", '/car/assign', data, 200, True)
         self.assertEqual(json_response["status_code"], 200)
-        self.assertEqual(json_response["message"], "Successfuly assigned a car")
+        self.assertEqual(json_response["message"], "Successfully assigned a car")
+
+        data = dict(id=1)
+        json_response = api_call(self, "GET", '/car/get', data, 200, True)
+        self.assertEqual(json_response["assign_id"], 1)
+        self.assertEqual(json_response["assign_type"], 2)
+        self.assertEqual(json_response["id"], 1)
+        self.assertEqual(json_response["make"], "Tesla")
 
     def test_wont_assign_to_branch_over_capacity(self):
         pass

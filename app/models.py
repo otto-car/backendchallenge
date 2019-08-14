@@ -70,6 +70,11 @@ class Branch(db.Model):
             query = query.filter(getattr(Branch, attr) == value)
         return db.session.query(Branch).first()
 
+    def get_assigned_cars_count(self):
+        query = db.session.query(Car)
+        query = query.filter(Car.assigned_type==2, Car.assigned_id==self.id)
+        return query.count()
+
     def serialize(self):
         return {
             "id": self.id,
