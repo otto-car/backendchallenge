@@ -243,6 +243,15 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], 'Missing car ID')
 
+        res = self.client.post('/car/delete')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/car/delete')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.get('/car/delete')
+        self.assertEqual(res.status_code, 405)
+
     def test_can_assign_car_to_driver(self):
         pass
 
@@ -502,6 +511,15 @@ class BranchTestCase(unittest.TestCase):
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], 'Missing branch ID')
 
+        res = self.client.post('/branch/delete')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/branch/delete')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.get('/branch/delete')
+        self.assertEqual(res.status_code, 405)
+
     def tearDown(self):
         with self.app.app_context():
             # drop all tables
@@ -722,6 +740,15 @@ class DriverTestCase(unittest.TestCase):
         json_response = api_call(self, "DELETE", '/driver/delete', data, 200, True)
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], 'Missing driver ID')
+
+        res = self.client.post('/driver/delete')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/driver/delete')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.get('/driver/delete')
+        self.assertEqual(res.status_code, 405)
 
     def tearDown(self):
         with self.app.app_context():
