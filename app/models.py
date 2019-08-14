@@ -67,5 +67,34 @@ class Branch(db.Model):
         return {
             "city": self.city,
             "postcode": self.postcode,
-            "capacity": self.capacity,
+            "capacity": self.capacity
+        }
+
+
+class Driver(db.Model):
+    __tablename__ = 'driver'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    dob = db.Column(db.Date, nullable=False)
+
+    def __init__(self, name, dob):
+        self.name = name
+        self.dob = dob
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    def get(driver_id):
+        return db.session.query(Driver).filter(Driver.id == driver_id).first()
+
+    def serialize(self):
+        return {
+            "name": self.name,
+            "dob": self.dob
         }
