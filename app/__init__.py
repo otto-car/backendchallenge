@@ -175,8 +175,9 @@ def create_app(config_name):
                     "status": 400,
                     "message": "Invalid car ID"
                 })
+            params = {"id": car_id}
 
-            car = Car.get(car_id)
+            car = Car.get(params)
 
             if not car:
                 return jsonify({

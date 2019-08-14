@@ -160,7 +160,7 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response['status'], 200)
         self.assertEqual(json_response['message'], "Car record was updated")
 
-        data = dict(car_id=1)
+        data = dict(id=1)
         res = self.client.get('/car/get', query_string=data, content_type='application/json')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
@@ -171,7 +171,7 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response['status'], 200)
         self.assertEqual(json_response['message'], "Car record was updated")
 
-        data = dict(car_id=1)
+        data = dict(id=1)
         json_response = api_call(self, "GET", '/car/get', data, 200, True)
         self.assertEqual(json_response['model'], '545i')
         self.assertEqual(json_response['year'], 2015)
@@ -219,7 +219,7 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response['status'], 200)
         self.assertEqual(json_response['message'], "Car deleted")
 
-        data = dict(car_id=1)
+        data = dict(id=1)
         json_response = api_call(self, "GET", '/car/get', data, 200, True)
         self.assertEqual(json_response['status'], 404)
         self.assertEqual(json_response['message'], "Car not found")
