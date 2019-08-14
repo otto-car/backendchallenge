@@ -113,6 +113,32 @@ def create_app(config_name):
             if "make" in request.args.keys():
                 params['make'] = request.args.get('make')
 
+            if "model" in request.args.keys():
+                params['model'] = request.args.get('model')
+
+            if "year" in request.args.keys():
+                year = request.args.get('year')
+                try:
+                    int(year)
+                    if len(str(year)) != 4:
+                        return jsonify({
+                            "status": 400,
+                            "message": "Invalid year"
+                        })
+                    params['year'] = year
+                except:
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid year"
+                    })
+
+            # check if params are empty
+            if not params:
+                return jsonify({
+                    "status": 400,
+                    "message": "Invalid request"
+                })
+
             car = Car.get(params)
 
             if not car:
