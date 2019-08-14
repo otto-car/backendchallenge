@@ -163,7 +163,7 @@ def create_app(config_name):
             if "id" not in request_data.keys():
                 return jsonify({
                     "status": 400,
-                    "message": "Missing car ID"
+                    "message": "Missing ID"
                 })
 
             id = request_data['id']
@@ -173,7 +173,7 @@ def create_app(config_name):
             except:
                 return jsonify({
                     "status": 400,
-                    "message": "Invalid car ID"
+                    "message": "Invalid ID"
                 })
             params = {"id": id}
 
@@ -220,7 +220,7 @@ def create_app(config_name):
             if not "id" in request.args:
                 return jsonify({
                     "status": 400,
-                    "message": "Missing car ID"
+                    "message": "Missing ID"
                 })
 
             id = request.args.get("id")
@@ -230,7 +230,7 @@ def create_app(config_name):
             except:
                 return jsonify({
                     "status": 400,
-                    "message": "Invalid car ID"
+                    "message": "Invalid ID"
                 })
 
             params = {"id": id}
@@ -396,7 +396,7 @@ def create_app(config_name):
             if "id" not in request_data.keys():
                 return jsonify({
                     "status": 400,
-                    "message": "Missing branch ID"
+                    "message": "Missing ID"
                 })
 
             id = request_data['id']
@@ -406,7 +406,7 @@ def create_app(config_name):
             except:
                 return jsonify({
                     "status": 400,
-                    "message": "Invalid branch ID"
+                    "message": "Invalid ID"
                 })
             params = {"id": id}
             branch = Branch.get(params)
@@ -467,7 +467,7 @@ def create_app(config_name):
             if not "id" in request.args:
                 return jsonify({
                     "status": 400,
-                    "message": "Missing branch ID"
+                    "message": "Missing ID"
                 })
 
             id = request.args.get("id")
@@ -477,7 +477,7 @@ def create_app(config_name):
             except:
                 return jsonify({
                     "status": 400,
-                    "message": "Invalid branch ID"
+                    "message": "Invalid ID"
                 })
 
             params = {"id": id}
