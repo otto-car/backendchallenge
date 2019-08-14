@@ -28,9 +28,19 @@ class Car(db.Model):
 
     def get(params):
         query = db.session.query(Car)
-        for attr, value in params.items():
-            query = query.filter(getattr(Car, attr) == value)
-        return db.session.query(Car).first()
+        if "id" in params.keys():
+            query = query.filter(Car.id == params['id'])
+        if "make" in params.keys():
+            query = query.filter(Car.make == params['make'])
+        if "model" in params.keys():
+            query = query.filter(Car.model == params['model'])
+        if "year" in params.keys():
+            query = query.filter(Car.year == params['year'])
+        if "assigned_type" in params.keys():
+            query = query.filter(Car.assigned_type == params['assigned_type'])
+        if "assigned_id" in params.keys():
+            query = query.filter(Car.assigned_id == params['assigned_id'])
+        return query.first()
 
     def serialize(self):
         return {
@@ -114,9 +124,17 @@ class Driver(db.Model):
 
     def get(params):
         query = db.session.query(Driver)
-        for attr, value in params.items():
-            query = query.filter(getattr(Driver, attr) == value)
-        return db.session.query(Driver).first()
+        if "id" in params.keys():
+            query = query.filter(Driver.id == params['id'])
+        if "first_name" in params.keys():
+            query = query.filter(Driver.first_name == params['first_name'])
+        if "middle_name" in params.keys():
+            query = query.filter(Driver.middle_name == params['middle_name'])
+        if "last_name" in params.keys():
+            query = query.filter(Driver.last_name == params['last_name'])
+        if "dob" in params.keys():
+            query = query.filter(Driver.dob == params['dob'])
+        return query.first()
 
     def serialize(self):
         return {
