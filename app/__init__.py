@@ -160,22 +160,22 @@ def create_app(config_name):
                     "message": "Invalid request"
                 })
 
-            if "car_id" not in request_data.keys():
+            if "id" not in request_data.keys():
                 return jsonify({
                     "status": 400,
                     "message": "Missing car ID"
                 })
 
-            car_id = request_data['car_id']
+            id = request_data['id']
 
             try:
-                int(car_id)
+                int(id)
             except:
                 return jsonify({
                     "status": 400,
                     "message": "Invalid car ID"
                 })
-            params = {"id": car_id}
+            params = {"id": id}
 
             car = Car.get(params)
 
@@ -217,23 +217,23 @@ def create_app(config_name):
     def car_delete():
         if request.method == "DELETE":
 
-            if not "car_id" in request.args:
+            if not "id" in request.args:
                 return jsonify({
                     "status": 400,
                     "message": "Missing car ID"
                 })
 
-            car_id = request.args.get("car_id")
+            id = request.args.get("id")
 
             try:
-                int(car_id)
+                int(id)
             except:
                 return jsonify({
                     "status": 400,
                     "message": "Invalid car ID"
                 })
 
-            params = {"id": car_id}
+            params = {"id": id}
 
             car = Car.get(params)
 

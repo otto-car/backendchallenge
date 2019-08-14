@@ -131,31 +131,31 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], 'Invalid request')
 
-        data = dict(car_id=None)
+        data = dict(id=None)
         json_response = api_call(self, "GET", '/car/get', data, 200, True)
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], 'Invalid request')
 
     def test_cant_get_car_id_doesnt_exist(self):
         """ Test can't get car ID that doesn't exist"""
-        data = dict(car_id=100)
+        data = dict(id=100)
         json_response = api_call(self, "GET", '/car/get', data, 200, True)
-        self.assertEqual(json_response['status'], 400)
-        self.assertEqual(json_response['message'], 'Invalid request')
+        self.assertEqual(json_response['status'], 404)
+        self.assertEqual(json_response['message'], 'Car not found')
 
     def test_cant_get_car_id_has_to_be_int(self):
         """ Test can't get a car with invalid car ID """
-        data = dict(car_id="abcd")
+        data = dict(id="abcd")
         json_response = api_call(self, "GET", '/car/get', data, 200, True)
         self.assertEqual(json_response['status'], 400)
-        self.assertEqual(json_response['message'], 'Invalid request')
+        self.assertEqual(json_response['message'], 'Invalid ID')
 
     def test_can_update_car(self):
         """ Test for updating car details"""
         data = dict(make="Tesla", model="Model 3", year=2015)
         api_call(self, "POST", '/car/create', data, 200)
 
-        data = dict(car_id=1, model="Model X")
+        data = dict(id=1, model="Model X")
         json_response = api_call(self, "PUT", '/car/update', data, 200, True)
         self.assertEqual(json_response['status'], 200)
         self.assertEqual(json_response['message'], "Car record was updated")
@@ -166,7 +166,7 @@ class CarTestCase(unittest.TestCase):
         json_response = res.get_json()
         self.assertEqual(json_response['model'], 'Model X')
 
-        data = dict(car_id=1, model="545i", year=2015)
+        data = dict(id=1, model="545i", year=2015)
         json_response = api_call(self, "PUT", '/car/update', data, 200, True)
         self.assertEqual(json_response['status'], 200)
         self.assertEqual(json_response['message'], "Car record was updated")
@@ -192,7 +192,7 @@ class CarTestCase(unittest.TestCase):
 
     def test_cant_update_car_invalid_id(self):
         """ Test that cant update car with ID taht doesn't exist"""
-        data = dict(car_id=257, year=2015)
+        data = dict(id=257, year=2015)
         json_response = api_call(self, "PUT", '/car/update', data, 200, True)
         self.assertEqual(json_response['status'], 404)
         self.assertEqual(json_response['message'], "Car not found")
@@ -204,7 +204,7 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], "Missing car ID")
 
-        data = dict(car_id="cowabunga!", model="C45 AMG")
+        data = dict(id="cowabunga!", model="C45 AMG")
         json_response = api_call(self, "PUT", '/car/update', data, 200, True)
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], "Invalid car ID")
@@ -214,7 +214,7 @@ class CarTestCase(unittest.TestCase):
         data = dict(make="Tesla", model="Model 3", year=2015)
         api_call(self, "POST", '/car/create', data, 200)
 
-        data = dict(car_id=1)
+        data = dict(id=1)
         json_response = api_call(self, "DELETE", '/car/delete', data, 200, True)
         self.assertEqual(json_response['status'], 200)
         self.assertEqual(json_response['message'], "Car deleted")
@@ -226,12 +226,12 @@ class CarTestCase(unittest.TestCase):
 
     def test_cant_delete_car_invalid_id(self):
         """ Test we cant delete car with invalid ID """
-        data = dict(car_id=102030)
+        data = dict(id=102030)
         json_response = api_call(self, "DELETE", '/car/delete', data, 200, True)
         self.assertEqual(json_response['status'], 404)
         self.assertEqual(json_response['message'], "Car not found")
 
-        data = dict(car_id="i_love_pizza")
+        data = dict(id="i_love_pizza")
         json_response = api_call(self, "DELETE", '/car/delete', data, 200, True)
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], "Invalid car ID")
