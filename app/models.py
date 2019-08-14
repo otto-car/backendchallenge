@@ -88,8 +88,10 @@ class Driver(db.Model):
     last_name = db.Column(db.String(100), nullable=False)
     dob = db.Column(db.Date, nullable=False)
 
-    def __init__(self, name, dob):
-        self.name = name
+    def __init__(self, first_name, middle_name, last_name, dob):
+        self.first_name = first_name
+        self.middle_name = middle_name
+        self.last_name = last_name
         self.dob = dob
 
     def save(self):
