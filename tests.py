@@ -437,7 +437,74 @@ class BranchTestCase(unittest.TestCase):
 
 
 class DriverTestCase(unittest.TestCase):
-    pass
+    def setUp(self):
+        self.app = create_app(config_name="testing")
+        self.client = self.app.test_client()
+
+        # set up test db
+        with self.app.app_context():
+            db.create_all()
+
+    def test_can_create_driver(self):
+        """ Test can create normal driver"""
+        data = dict(name="Alan Turing", dob="23/06/1962")
+        json_response = api_call(self, "POST", "/driver/create", data, 200, True)
+        self.assertEqual(json_response["status"], 201)
+        self.assertEqual(json_response["message"], 'Driver created')
+
+    def test_cant_create_driver_invalid_request(self):
+        """ Test cant create driver with invalid requests"""
+        res = self.client.post('/driver/create')
+        self.assertEqual(res.status_code, 400)
+
+        res = self.client.post('/driver/create', data=None, content_type='application/json')
+        self.assertEqual(res.status_code, 400)
+
+        res = self.client.get('/driver/create')
+        self.assertEqual(res.status_code, 405)
+
+    def test_cant_create_driver_missing_or_invalid_params(self):
+        """ Test cant create driver with wrong or missing params"""
+        data = dict()
+        json_response = api_call(self, "POST", "/driver/create", data, 200, True)
+        self.assertEqual(json_response["status"], 400)
+        self.assertEqual(json_response["message"], "Missing name")
+
+        data = dict(dob="23/06/1962")
+        json_response = api_call(self, "POST", "/driver/create", data, 200, True)
+        self.assertEqual(json_response["status"], 400)
+        self.assertEqual(json_response["message"], "Missing name")
+
+        data = dict(name="Alan Turing")
+        json_response = api_call(self, "POST", "/driver/create", data, 200, True)
+        self.assertEqual(json_response["status"], 400)
+        self.assertEqual(json_response["message"], "Missing DOB")
+
+        data = dict(name="Alan Turing", dob="23/06/1902")
+        json_response = api_call(self, "POST", "/driver/create", data, 200, True)
+        self.assertEqual(json_response["status"], 400)
+        self.assertEqual(json_response["message"], "Invalid DOB")
+
+        data = dict(name="Alan Turing", dob="23/06/2025")
+        json_response = api_call(self, "POST", "/driver/create", data, 200, True)
+        self.assertEqual(json_response["status"], 400)
+        self.assertEqual(json_response["message"], "Invalid DOB")
+
+        data = dict(name="Alan Turing", dob="23 June")
+        json_response = api_call(self, "POST", "/driver/create", data, 200, True)
+        self.assertEqual(json_response["status"], 400)
+        self.assertEqual(json_response["message"], "Invalid DOB")
+
+        data = dict(name="Alan Turing", dob="never")
+        json_response = api_call(self, "POST", "/driver/create", data, 200, True)
+        self.assertEqual(json_response["status"], 400)
+        self.assertEqual(json_response["message"], "Invalid DOB")
+
+    def tearDown(self):
+        with self.app.app_context():
+            # drop all tables
+            db.session.remove()
+            db.drop_all()
 
 
 if __name__ == "__main__":
