@@ -301,8 +301,8 @@ class CarTestCase(unittest.TestCase):
 
         data = dict(id=1)
         json_response = api_call(self, "GET", '/car/get', data, 200, True)
-        self.assertEqual(json_response["assign_id"], 1)
-        self.assertEqual(json_response["assign_type"], 2)
+        self.assertEqual(json_response["assigned_id"], 1)
+        self.assertEqual(json_response["assigned_type"], 2)
         self.assertEqual(json_response["id"], 1)
         self.assertEqual(json_response["make"], "Tesla")
 

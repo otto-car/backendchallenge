@@ -38,8 +38,8 @@ class Car(db.Model):
             "make": self.make,
             "model": self.model,
             "year": self.year,
-            "assign_type": self.assigned_type,
-            "assign_id": self.assigned_id
+            "assigned_type": self.assigned_type,
+            "assigned_id": self.assigned_id
         }
 
 
