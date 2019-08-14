@@ -481,6 +481,9 @@ class DriverTestCase(unittest.TestCase):
 
     def test_cant_create_driver_invalid_request(self):
         """ Test cant create driver with invalid requests"""
+        json_response = api_call(self, "POST", '/driver/create', None, 200)
+        self.assertEqual(json_response, None)
+
         res = self.client.post('/driver/create')
         self.assertEqual(res.status_code, 400)
 
@@ -488,6 +491,12 @@ class DriverTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 400)
 
         res = self.client.get('/driver/create')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.delete('/driver/create')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/driver/create')
         self.assertEqual(res.status_code, 405)
 
     def test_cant_create_driver_missing_or_invalid_params(self):

@@ -213,7 +213,6 @@ def create_app(config_name):
                     "message": "Invalid request"
                 })
 
-            # Make, model and year are necessary in order to create a car object
             if "city" in request_data.keys():
                 city = request_data['city']
             else:
@@ -400,7 +399,12 @@ def create_app(config_name):
         if request.method == "POST":
             request_data = request.get_json(force=True)
 
-            # Make, model and year are necessary in order to create a car object
+            if request_data is None:
+                return jsonify({
+                    "status": 400,
+                    "message": "Invalid request"
+                })
+
             if "name" in request_data.keys():
                 name = request_data['name']
             else:
@@ -472,6 +476,12 @@ def create_app(config_name):
     def driver_update():
         if request.method == "PUT":
             request_data = request.get_json(force=True)
+
+            if request_data is None:
+                return jsonify({
+                    "status": 400,
+                    "message": "Invalid request"
+                })
 
             if "driver_id" not in request_data.keys():
                 return jsonify({
