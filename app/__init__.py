@@ -487,7 +487,7 @@ def create_app(config_name):
             driver.save()
 
             return jsonify({
-                "status": "200",
+                "status": 200,
                 "message": "Driver record was updated"
             })
 

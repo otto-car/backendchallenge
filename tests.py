@@ -361,7 +361,9 @@ class BranchTestCase(unittest.TestCase):
         self.assertEqual(json_response['capacity'], 5)
 
         data = dict(branch_id=1, city="Guildford", postcode="GU2 8DJ", capacity=100)
-        api_call(self, "PUT", '/branch/update', data, 200)
+        json_response = api_call(self, "PUT", '/branch/update', data, 200, True)
+        self.assertEqual(json_response['status'], 200)
+        self.assertEqual(json_response['message'], "Branch record was updated")
 
         data = dict(branch_id=1)
         json_response = api_call(self, "GET", '/branch/get', data, 200, True)
@@ -370,7 +372,9 @@ class BranchTestCase(unittest.TestCase):
         self.assertEqual(json_response['capacity'], 100)
 
         data = dict(branch_id=1, capacity=90)
-        api_call(self, "PUT", '/branch/update', data, 200)
+        json_response = api_call(self, "PUT", '/branch/update', data, 200, True)
+        self.assertEqual(json_response['status'], 200)
+        self.assertEqual(json_response['message'], "Branch record was updated")
 
         data = dict(branch_id=1)
         json_response = api_call(self, "GET", '/branch/get', data, 200, True)
@@ -547,8 +551,9 @@ class DriverTestCase(unittest.TestCase):
         api_call(self, "POST", '/driver/create', data, 200)
 
         data = dict(driver_id=1, name="John Malkovich")
-        res = self.client.put('/driver/update', data=json.dumps(data), content_type='application/json')
-        self.assertEqual(res.status_code, 200)
+        json_response = api_call(self, "PUT", '/driver/update', data, 200, True)
+        self.assertEqual(json_response['status'], 200)
+        self.assertEqual(json_response['message'], "Driver record was updated")
 
         data = dict(driver_id=1)
         res = self.client.get('/driver/get', query_string=data, content_type='application/json')
@@ -557,8 +562,9 @@ class DriverTestCase(unittest.TestCase):
         self.assertEqual(json_response['name'], 'John Malkovich')
 
         data = dict(driver_id=1, name="Tesla Nicola", dob="12/12/2000")
-        res = self.client.put('/driver/update', data=json.dumps(data), content_type='application/json')
-        self.assertEqual(res.status_code, 200)
+        json_response = api_call(self, "PUT", '/driver/update', data, 200, True)
+        self.assertEqual(json_response['status'], 200)
+        self.assertEqual(json_response['message'], "Driver record was updated")
 
         data = dict(driver_id=1)
         json_response = api_call(self, "GET", '/driver/get', data, 200, True)
