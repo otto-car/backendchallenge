@@ -72,7 +72,7 @@ class Branch(db.Model):
 
     def get_assigned_cars_count(self):
         query = db.session.query(Car)
-        query = query.filter(Car.assigned_type==2, Car.assigned_id==self.id)
+        query = query.filter(Car.assigned_type == 2, Car.assigned_id == self.id)
         return query.count()
 
     def serialize(self):

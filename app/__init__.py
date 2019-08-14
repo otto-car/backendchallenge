@@ -284,6 +284,11 @@ def create_app(config_name):
                     if branch.capacity > occupancy:
                         car.assigned_type = assigned_type
                         car.assigned_id = branch.id
+                    else:
+                        return jsonify({
+                            "status_code": 400,
+                            "message": "Branch has reached its capacity"
+                        })
 
             car.save()
 

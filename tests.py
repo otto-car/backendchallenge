@@ -307,7 +307,24 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response["make"], "Tesla")
 
     def test_wont_assign_to_branch_over_capacity(self):
-        pass
+        data = dict(city="London", postcode="E1W 3SS", capacity=1)
+        api_call(self, "POST", "/branch/create", data, 200, True)
+
+        data = dict(make="Tesla", model="Model 3", year=2015)
+        api_call(self, "POST", '/car/create', data, 200)
+
+        data = dict(make="BMW", model="525d", year=2018)
+        api_call(self, "POST", '/car/create', data, 200)
+
+        data = dict(id=1, assigned_type=2, assigned_id=3)
+        json_response = api_call(self, "POST", '/car/assign', data, 200, True)
+        self.assertEqual(json_response["status_code"], 200)
+        self.assertEqual(json_response["message"], "Successfully assigned a car")
+
+        data = dict(id=2, assigned_type=2, assigned_id=3)
+        json_response = api_call(self, "POST", '/car/assign', data, 200, True)
+        self.assertEqual(json_response["status_code"], 400)
+        self.assertEqual(json_response["message"], "Branch has reached its capacity")
 
     def test_wont_assign_to_non_existing_branch(self):
         pass
