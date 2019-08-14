@@ -316,14 +316,14 @@ class CarTestCase(unittest.TestCase):
         data = dict(make="BMW", model="525d", year=2018)
         api_call(self, "POST", '/car/create', data, 200)
 
-        data = dict(id=1, assigned_type=2, assigned_id=3)
+        data = dict(id=1, assigned_type=2, assigned_id=1)
         json_response = api_call(self, "POST", '/car/assign', data, 200, True)
         self.assertEqual(json_response["status_code"], 200)
         self.assertEqual(json_response["message"], "Successfully assigned a car")
 
-        data = dict(id=2, assigned_type=2, assigned_id=3)
+        data = dict(id=2, assigned_type=2, assigned_id=1)
         json_response = api_call(self, "POST", '/car/assign', data, 200, True)
-        self.assertEqual(json_response["status_code"], 200)
+        self.assertEqual(json_response["status_code"], 400)
         self.assertEqual(json_response["message"], "Branch has reached its capacity")
 
     def test_wont_assign_to_non_existing_branch(self):

@@ -74,7 +74,7 @@ class Branch(db.Model):
             query = query.filter(Branch.id == params['postcode'])
         return query.first()
 
-    def get_assigned_cars_count(id):
+    def get_assigned_cars_count(self, id):
         query = db.session.query(Car.id)
         query = query.filter(Car.assigned_type == 2)
         query = query.filter(Car.assigned_id == id)

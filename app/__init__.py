@@ -296,7 +296,8 @@ def create_app(config_name):
                 branch = Branch.get(params)
 
                 if branch:
-                    occupancy = branch.get_assigned_cars_count(branch.id)
+                    occupancy = branch.get_assigned_cars_count(assigned_id)
+
                     if branch.capacity > occupancy:
                         car.assigned_type = assigned_type
                         car.assigned_id = assigned_id
