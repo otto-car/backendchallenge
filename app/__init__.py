@@ -289,6 +289,11 @@ def create_app(config_name):
                             "status_code": 400,
                             "message": "Branch has reached its capacity"
                         })
+                else:
+                    return jsonify({
+                        "status_code": 404,
+                        "message": "Branch not found"
+                    })
 
             car.save()
 

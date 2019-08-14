@@ -327,7 +327,13 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response["message"], "Branch has reached its capacity")
 
     def test_wont_assign_to_non_existing_branch(self):
-        pass
+        data = dict(make="Tesla", model="Model 3", year=2015)
+        api_call(self, "POST", '/car/create', data, 200)
+
+        data = dict(id=1, assigned_type=2, assigned_id=75)
+        json_response = api_call(self, "POST", '/car/assign', data, 200, True)
+        self.assertEqual(json_response["status_code"], 404)
+        self.assertEqual(json_response["message"], "Branch not found")
 
     def test_can_assign_car_to_driver(self):
         pass
