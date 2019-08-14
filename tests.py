@@ -252,8 +252,19 @@ class CarTestCase(unittest.TestCase):
         res = self.client.get('/car/delete')
         self.assertEqual(res.status_code, 405)
 
-    def test_can_assign_car_to_driver(self):
-        pass
+    def test_cant_assign_invalid_requests(self):
+        """" Test for correct method to be used when sending update requests"""
+        res = self.client.post('/car/assign')
+        self.assertEqual(res.status_code, 400)
+
+        res = self.client.delete('/car/assign')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/car/assign')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.get('/car/assign')
+        self.assertEqual(res.status_code, 405)
 
     def test_can_assign_car_to_branch(self):
         pass
@@ -261,10 +272,16 @@ class CarTestCase(unittest.TestCase):
     def test_wont_assign_to_branch_over_capacity(self):
         pass
 
+    def test_wont_assign_to_non_existing_branch(self):
+        pass
+
+    def test_can_assign_car_to_driver(self):
+        pass
+
     def test_wont_assign_to_non_existing_driver(self):
         pass
 
-    def test_wont_assign_to_non_existing_branch(self):
+    def test_can_unassign_everything_from_car(self):
         pass
 
     def tearDown(self):
