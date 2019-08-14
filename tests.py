@@ -176,6 +176,20 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response['model'], '545i')
         self.assertEqual(json_response['year'], 2015)
 
+    def test_cant_update_car_invalid_requests(self):
+        """" Test for correct method to be used when sending update requests"""
+        res = self.client.post('/car/update')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.delete('/car/update')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/car/update')
+        self.assertEqual(res.status_code, 400)
+
+        res = self.client.get('/car/update')
+        self.assertEqual(res.status_code, 200)
+
     def test_cant_update_car_invalid_id(self):
         """ Test that cant update car with ID taht doesn't exist"""
         data = dict(car_id=257, year=2015)
