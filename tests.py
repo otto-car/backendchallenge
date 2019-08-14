@@ -383,7 +383,7 @@ class BranchTestCase(unittest.TestCase):
         self.assertEqual(json_response['status'], 404)
         self.assertEqual(json_response['message'], "Branch not found")
 
-    def test_cant_update_car_invalid_parameters(self):
+    def test_cant_update_branch_invalid_parameters(self):
         """ Test can't update branch with wrong or missing ID"""
         data = dict(capacity=2018)
         json_response = api_call(self, "PUT", '/branch/update', data, 200, True)
@@ -494,6 +494,36 @@ class DriverTestCase(unittest.TestCase):
         json_response = api_call(self, "POST", "/driver/create", data, 200, True)
         self.assertEqual(json_response["status"], 400)
         self.assertEqual(json_response["message"], "Invalid DOB")
+
+    def test_can_get_driver(self):
+        """ Test that API can retrieve a driver"""
+        data = dict(name="Andrej Lukasov", dob="25/02/1990")
+        self.client.post('/driver/create', data=json.dumps(data), content_type='application/json')
+
+        data = dict(driver_id=1)
+        json_response = api_call(self, "GET", '/driver/get', data, 200, True)
+        self.assertEqual(json_response['namr'], 'Andrej Lukasov')
+        self.assertEqual(json_response['dob'], '25/02/1990')
+
+    def test_cant_get_driver_invalid_request(self):
+        """ Test that endpoint can deal with missing query string"""
+        res = self.client.get('/driver/get')
+        self.assertEqual(res.status_code, 200)
+        json_response = res.get_json()
+        self.assertEqual(json_response['status'], 400)
+        self.assertEqual(json_response['message'], 'Missing driver ID')
+
+    def test_cant_get_driver_missing_params(self):
+        """ Test that endpoint can deal with empty param"""
+        data = dict()
+        json_response = api_call(self, "GET", '/driver/get', data, 200, True)
+        self.assertEqual(json_response['status'], 400)
+        self.assertEqual(json_response['message'], 'Missing driver ID')
+
+        data = dict(driver_id=None)
+        json_response = api_call(self, "GET", '/driver/get', data, 200, True)
+        self.assertEqual(json_response['status'], 400)
+        self.assertEqual(json_response['message'], 'Missing driver ID')
 
     def tearDown(self):
         with self.app.app_context():

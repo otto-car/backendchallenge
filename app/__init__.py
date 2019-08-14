@@ -370,8 +370,9 @@ def create_app(config_name):
             if "dob" in request_data.keys():
                 try:
                     dob = datetime.datetime.strptime(request_data['dob'], '%d/%m/%Y')
-                    min_age = datetime.timedelta(weeks=52 * 17)
 
+                    # Won't let drivers below age 18 to join
+                    min_age = datetime.timedelta(weeks=52 * 18)
                     if datetime.datetime.now() - dob < min_age:
                         return jsonify({
                             "status": 400,
