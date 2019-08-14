@@ -3,12 +3,14 @@ from flask_sqlalchemy import SQLAlchemy
 from instance.config import app_config
 from flask import request, jsonify, abort
 import re
+import datetime
+from datetime import date
 
 db = SQLAlchemy()
 
 
 def create_app(config_name):
-    from app.models import Car, Branch
+    from app.models import Car, Branch, Driver
 
     app = FlaskAPI(__name__, instance_relative_config=True)
     app.config.from_object(app_config[config_name])
@@ -350,5 +352,50 @@ def create_app(config_name):
                 "status": 200,
                 "message": "Branch deleted"
             })
+
+    @app.route('/driver/create', methods=['POST'])
+    def driver_create():
+        if request.method == "POST":
+            request_data = request.get_json(force=True)
+
+            # Make, model and year are necessary in order to create a car object
+            if "name" in request_data.keys():
+                name = request_data['name']
+            else:
+                return jsonify({
+                    "status": 400,
+                    "message": "Missing name"
+                })
+
+            if "dob" in request_data.keys():
+                try:
+                    dob = datetime.datetime.strptime(request_data['dob'], '%d/%m/%Y')
+                    min_age = datetime.timedelta(weeks=52 * 17)
+
+                    if datetime.datetime.now() - dob < min_age:
+                        return jsonify({
+                            "status": 400,
+                            "message": "Invalid DOB"
+                        })
+
+                    dob = dob.strftime("%m/%d/%Y")
+
+                except:
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid DOB"
+                    })
+            else:
+                return jsonify({
+                    "status": 400,
+                    "message": "Missing DOB"
+                })
+
+            driver = Driver(name, dob)
+            driver.save()
+            return jsonify({
+                "status": 201,
+                "message": "Driver created"}
+            )
 
     return app

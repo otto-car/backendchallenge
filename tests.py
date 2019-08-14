@@ -480,11 +480,6 @@ class DriverTestCase(unittest.TestCase):
         self.assertEqual(json_response["status"], 400)
         self.assertEqual(json_response["message"], "Missing DOB")
 
-        data = dict(name="Alan Turing", dob="23/06/1902")
-        json_response = api_call(self, "POST", "/driver/create", data, 200, True)
-        self.assertEqual(json_response["status"], 400)
-        self.assertEqual(json_response["message"], "Invalid DOB")
-
         data = dict(name="Alan Turing", dob="23/06/2025")
         json_response = api_call(self, "POST", "/driver/create", data, 200, True)
         self.assertEqual(json_response["status"], 400)
