@@ -42,22 +42,34 @@ class CarTestCase(unittest.TestCase):
 
     def test_cant_create_car_invalid_request(self):
         """ Test that API will return 400 (bad request) for invalid requests"""
+        json_response = api_call(self, "POST", '/car/create', None, 200)
+        self.assertEqual(json_response, None)
+
         res = self.client.post('/car/create')
         self.assertEqual(res.status_code, 400)
 
         res = self.client.post('/car/create', data=None, content_type='application/json')
         self.assertEqual(res.status_code, 400)
 
-        data = dict(make="Tesla", model="Model 3", year="Stringy McStringface")
-        json_response = api_call(self, "POST", "/car/create", data, 200, True)
-        self.assertEqual(json_response['status'], 400)
-        self.assertEqual(json_response['message'], 'Invalid year')
+        res = self.client.get('/car/create')
+        self.assertEqual(res.status_code, 405)
 
-    def test_cant_create_car_missing_params(self):
+        res = self.client.delete('/car/create')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/car/create')
+        self.assertEqual(res.status_code, 405)
+
+    def test_cant_create_car_missing_invalid_params(self):
         """ Test that API will return expected errors when params are missing"""
         json_response = api_call(self, "POST", "/car/create", dict(), 200, True)
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], 'Missing make')
+
+        data = dict(make="Tesla", model="Model 3", year="Stringy McStringface")
+        json_response = api_call(self, "POST", "/car/create", data, 200, True)
+        self.assertEqual(json_response['status'], 400)
+        self.assertEqual(json_response['message'], 'Invalid year')
 
         data = dict(model="Model 3", year=2018)
         json_response = api_call(self, "POST", "/car/create", data, 200, True)
@@ -87,7 +99,7 @@ class CarTestCase(unittest.TestCase):
     def test_can_get_car(self):
         """ Test that API can retrieve a car"""
         data = dict(make="BMW", model="530d", year=2018)
-        self.client.post('/car/create', data=json.dumps(data), content_type='application/json')
+        api_call(self, "POST", '/car/create', data, 200)
 
         data = dict(car_id=1)
         json_response = api_call(self, "GET", '/car/get', data, 200, True)
@@ -97,6 +109,15 @@ class CarTestCase(unittest.TestCase):
 
     def test_cant_get_car_invalid_request(self):
         """ Test that endpoint can deal with missing query string"""
+        res = self.client.post('/car/get')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.delete('/car/get')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/car/get')
+        self.assertEqual(res.status_code, 405)
+
         res = self.client.get('/car/get')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
@@ -135,8 +156,9 @@ class CarTestCase(unittest.TestCase):
         api_call(self, "POST", '/car/create', data, 200)
 
         data = dict(car_id=1, model="Model X")
-        res = self.client.put('/car/update', data=json.dumps(data), content_type='application/json')
-        self.assertEqual(res.status_code, 200)
+        json_response = api_call(self, "PUT", '/car/update', data, 200, True)
+        self.assertEqual(json_response['status'], 200)
+        self.assertEqual(json_response['message'], "Car record was updated")
 
         data = dict(car_id=1)
         res = self.client.get('/car/get', query_string=data, content_type='application/json')
@@ -145,13 +167,28 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response['model'], 'Model X')
 
         data = dict(car_id=1, model="545i", year=2015)
-        res = self.client.put('/car/update', data=json.dumps(data), content_type='application/json')
-        self.assertEqual(res.status_code, 200)
+        json_response = api_call(self, "PUT", '/car/update', data, 200, True)
+        self.assertEqual(json_response['status'], 200)
+        self.assertEqual(json_response['message'], "Car record was updated")
 
         data = dict(car_id=1)
         json_response = api_call(self, "GET", '/car/get', data, 200, True)
         self.assertEqual(json_response['model'], '545i')
         self.assertEqual(json_response['year'], 2015)
+
+    def test_cant_update_car_invalid_requests(self):
+        """" Test for correct method to be used when sending update requests"""
+        res = self.client.post('/car/update')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.delete('/car/update')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/car/update')
+        self.assertEqual(res.status_code, 400)
+
+        res = self.client.get('/car/update')
+        self.assertEqual(res.status_code, 405)
 
     def test_cant_update_car_invalid_id(self):
         """ Test that cant update car with ID taht doesn't exist"""
@@ -206,6 +243,15 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], 'Missing car ID')
 
+        res = self.client.post('/car/delete')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/car/delete')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.get('/car/delete')
+        self.assertEqual(res.status_code, 405)
+
     def test_can_assign_car_to_driver(self):
         pass
 
@@ -246,6 +292,9 @@ class BranchTestCase(unittest.TestCase):
 
     def test_cant_create_branch_invalid_request(self):
         """ Test cant create branch with invalid requests"""
+        json_response = api_call(self, "POST", '/branch/create', None, 200)
+        self.assertEqual(json_response, None)
+
         res = self.client.post('/branch/create')
         self.assertEqual(res.status_code, 400)
 
@@ -253,6 +302,12 @@ class BranchTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 400)
 
         res = self.client.get('/branch/create')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.delete('/branch/create')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/branch/create')
         self.assertEqual(res.status_code, 405)
 
     def test_cant_create_branch_missing_or_invalid_params(self):
@@ -315,6 +370,15 @@ class BranchTestCase(unittest.TestCase):
 
     def test_cant_get_branch_invalid_request(self):
         """ Test that endpoint can deal with missing query string"""
+        res = self.client.post('/branch/get')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.delete('/branch/get')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/branch/get')
+        self.assertEqual(res.status_code, 405)
+
         res = self.client.get('/branch/get')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
@@ -359,7 +423,9 @@ class BranchTestCase(unittest.TestCase):
         self.assertEqual(json_response['capacity'], 5)
 
         data = dict(branch_id=1, city="Guildford", postcode="GU2 8DJ", capacity=100)
-        api_call(self, "PUT", '/branch/update', data, 200)
+        json_response = api_call(self, "PUT", '/branch/update', data, 200, True)
+        self.assertEqual(json_response['status'], 200)
+        self.assertEqual(json_response['message'], "Branch record was updated")
 
         data = dict(branch_id=1)
         json_response = api_call(self, "GET", '/branch/get', data, 200, True)
@@ -368,13 +434,29 @@ class BranchTestCase(unittest.TestCase):
         self.assertEqual(json_response['capacity'], 100)
 
         data = dict(branch_id=1, capacity=90)
-        api_call(self, "PUT", '/branch/update', data, 200)
+        json_response = api_call(self, "PUT", '/branch/update', data, 200, True)
+        self.assertEqual(json_response['status'], 200)
+        self.assertEqual(json_response['message'], "Branch record was updated")
 
         data = dict(branch_id=1)
         json_response = api_call(self, "GET", '/branch/get', data, 200, True)
         self.assertEqual(json_response['city'], 'Guildford')
         self.assertEqual(json_response['postcode'], 'GU2 8DJ')
         self.assertEqual(json_response['capacity'], 90)
+
+    def test_cant_update_branch_invalid_requests(self):
+        """" Test for correct method to be used when sending update requests"""
+        res = self.client.post('/branch/update')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.delete('/branch/update')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/branch/update')
+        self.assertEqual(res.status_code, 400)
+
+        res = self.client.get('/branch/update')
+        self.assertEqual(res.status_code, 405)
 
     def test_cant_update_branch_invalid_id(self):
         """ Test that cant update branch with ID that doesn't exist"""
@@ -429,6 +511,15 @@ class BranchTestCase(unittest.TestCase):
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], 'Missing branch ID')
 
+        res = self.client.post('/branch/delete')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/branch/delete')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.get('/branch/delete')
+        self.assertEqual(res.status_code, 405)
+
     def tearDown(self):
         with self.app.app_context():
             # drop all tables
@@ -454,6 +545,9 @@ class DriverTestCase(unittest.TestCase):
 
     def test_cant_create_driver_invalid_request(self):
         """ Test cant create driver with invalid requests"""
+        json_response = api_call(self, "POST", '/driver/create', None, 200)
+        self.assertEqual(json_response, None)
+
         res = self.client.post('/driver/create')
         self.assertEqual(res.status_code, 400)
 
@@ -461,6 +555,12 @@ class DriverTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 400)
 
         res = self.client.get('/driver/create')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.delete('/driver/create')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/driver/create')
         self.assertEqual(res.status_code, 405)
 
     def test_cant_create_driver_missing_or_invalid_params(self):
@@ -498,7 +598,7 @@ class DriverTestCase(unittest.TestCase):
     def test_can_get_driver(self):
         """ Test that API can retrieve a driver"""
         data = dict(name="Andrej Lukasov", dob="25/02/1990")
-        self.client.post('/driver/create', data=json.dumps(data), content_type='application/json')
+        api_call(self, "POST", '/driver/create', data, 200)
 
         data = dict(driver_id=1)
         json_response = api_call(self, "GET", '/driver/get', data, 200, True)
@@ -507,6 +607,15 @@ class DriverTestCase(unittest.TestCase):
 
     def test_cant_get_driver_invalid_request(self):
         """ Test that endpoint can deal with missing query string"""
+        res = self.client.post('/driver/get')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.delete('/driver/get')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/driver/get')
+        self.assertEqual(res.status_code, 405)
+
         res = self.client.get('/driver/get')
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
@@ -545,23 +654,37 @@ class DriverTestCase(unittest.TestCase):
         api_call(self, "POST", '/driver/create', data, 200)
 
         data = dict(driver_id=1, name="John Malkovich")
-        res = self.client.put('/driver/update', data=json.dumps(data), content_type='application/json')
-        self.assertEqual(res.status_code, 200)
+        json_response = api_call(self, "PUT", '/driver/update', data, 200, True)
+        self.assertEqual(json_response['status'], 200)
+        self.assertEqual(json_response['message'], "Driver record was updated")
 
         data = dict(driver_id=1)
-        res = self.client.get('/driver/get', query_string=data, content_type='application/json')
-        self.assertEqual(res.status_code, 200)
-        json_response = res.get_json()
+        json_response = api_call(self, "GET", '/driver/get', data, 200, True)
         self.assertEqual(json_response['name'], 'John Malkovich')
 
         data = dict(driver_id=1, name="Tesla Nicola", dob="12/12/2000")
-        res = self.client.put('/driver/update', data=json.dumps(data), content_type='application/json')
-        self.assertEqual(res.status_code, 200)
+        json_response = api_call(self, "PUT", '/driver/update', data, 200, True)
+        self.assertEqual(json_response['status'], 200)
+        self.assertEqual(json_response['message'], "Driver record was updated")
 
         data = dict(driver_id=1)
         json_response = api_call(self, "GET", '/driver/get', data, 200, True)
         self.assertEqual(json_response['name'], 'Tesla Nicola')
         self.assertEqual(json_response['dob'], "12/12/2000")
+
+    def test_cant_update_driver_invalid_requests(self):
+        """" Test for correct method to be used when sending update requests"""
+        res = self.client.post('/driver/update')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.delete('/driver/update')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/driver/update')
+        self.assertEqual(res.status_code, 400)
+
+        res = self.client.get('/driver/update')
+        self.assertEqual(res.status_code, 405)
 
     def test_cant_update_driver_invalid_id(self):
         """ Test that cant update driver with ID taht doesn't exist"""
@@ -615,6 +738,15 @@ class DriverTestCase(unittest.TestCase):
         json_response = api_call(self, "DELETE", '/driver/delete', data, 200, True)
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], 'Missing driver ID')
+
+        res = self.client.post('/driver/delete')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/driver/delete')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.get('/driver/delete')
+        self.assertEqual(res.status_code, 405)
 
     def tearDown(self):
         with self.app.app_context():

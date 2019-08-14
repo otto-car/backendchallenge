@@ -23,6 +23,12 @@ def create_app(config_name):
         if request.method == "POST":
             request_data = request.get_json(force=True)
 
+            if request_data is None:
+                return jsonify({
+                    "status": 400,
+                    "message": "Invalid request"
+                })
+
             # Make, model and year are necessary in order to create a car object
             if "make" in request_data.keys():
                 make = request_data['make']
@@ -43,6 +49,11 @@ def create_app(config_name):
             if "year" in request_data.keys():
                 try:
                     int(request_data['year'])
+                    if len(str(request_data['year'])) != 4:
+                        return jsonify({
+                            "status": 400,
+                            "message": "Invalid year"
+                        })
                     year = request_data['year']
                 except:
                     return jsonify({
@@ -108,6 +119,12 @@ def create_app(config_name):
         if request.method == "PUT":
             request_data = request.get_json(force=True)
 
+            if request_data is None:
+                return jsonify({
+                    "status": 400,
+                    "message": "Invalid request"
+                })
+
             if "car_id" not in request_data.keys():
                 return jsonify({
                     "status": 400,
@@ -141,6 +158,11 @@ def create_app(config_name):
             if "year" in request_data.keys():
                 try:
                     int(request_data['year'])
+                    if len(str(request_data['year'])) != 4:
+                        return jsonify({
+                            "status": 400,
+                            "message": "Invalid year"
+                        })
                     car.year = request_data['year']
                 except:
                     return jsonify({
@@ -150,7 +172,10 @@ def create_app(config_name):
 
             car.save()
 
-            return jsonify({"response": "Car record was updated"})
+            return jsonify({
+                "status": 200,
+                "message": "Car record was updated"
+            })
 
     @app.route('/car/delete', methods=['DELETE'])
     def car_delete():
@@ -192,9 +217,19 @@ def create_app(config_name):
         if request.method == "POST":
             request_data = request.get_json(force=True)
 
-            # Make, model and year are necessary in order to create a car object
+            if request_data is None:
+                return jsonify({
+                    "status": 400,
+                    "message": "Invalid request"
+                })
+
             if "city" in request_data.keys():
                 city = request_data['city']
+                if not isinstance(city, str):
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid city"
+                    })
             else:
                 return jsonify({
                     "status": 400,
@@ -202,7 +237,7 @@ def create_app(config_name):
                 })
 
             if "postcode" in request_data.keys():
-                postcode = request_data['postcode']
+                postcode = str(request_data['postcode'])
                 if len(postcode) > 8:
                     return jsonify({
                         "status": 400,
@@ -274,6 +309,12 @@ def create_app(config_name):
         if request.method == "PUT":
             request_data = request.get_json(force=True)
 
+            if request_data is None:
+                return jsonify({
+                    "status": 400,
+                    "message": "Invalid request"
+                })
+
             if "branch_id" not in request_data.keys():
                 return jsonify({
                     "status": 400,
@@ -299,9 +340,29 @@ def create_app(config_name):
                 })
 
             if "city" in request_data.keys():
-                branch.city = request_data['city']
+                city = request_data['city']
+
+                if not isinstance(city, str):
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid city"
+                    })
+
+                branch.city = city
 
             if "postcode" in request_data.keys():
+                postcode = request_data['postcode']
+                if len(postcode) > 8:
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid postcode"
+                    })
+                pattern = re.compile(r'\b[A-Z]{1,2}[0-9][A-Z0-9]? [0-9][ABD-HJLNP-UW-Z]{2}\b')
+                if not pattern.match(postcode):
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid postcode"
+                    })
                 branch.postcode = request_data['postcode']
 
             if "capacity" in request_data.keys():
@@ -316,7 +377,10 @@ def create_app(config_name):
 
             branch.save()
 
-            return jsonify({"response": "Branch record was updated"})
+            return jsonify({
+                "status": 200,
+                "message": "Branch record was updated"
+            })
 
     @app.route('/branch/delete', methods=['DELETE'])
     def branch_delete():
@@ -358,9 +422,19 @@ def create_app(config_name):
         if request.method == "POST":
             request_data = request.get_json(force=True)
 
-            # Make, model and year are necessary in order to create a car object
+            if request_data is None:
+                return jsonify({
+                    "status": 400,
+                    "message": "Invalid request"
+                })
+
             if "name" in request_data.keys():
                 name = request_data['name']
+                if not isinstance(name, str):
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid name"
+                    })
             else:
                 return jsonify({
                     "status": 400,
@@ -431,6 +505,12 @@ def create_app(config_name):
         if request.method == "PUT":
             request_data = request.get_json(force=True)
 
+            if request_data is None:
+                return jsonify({
+                    "status": 400,
+                    "message": "Invalid request"
+                })
+
             if "driver_id" not in request_data.keys():
                 return jsonify({
                     "status": 400,
@@ -456,7 +536,13 @@ def create_app(config_name):
                 })
 
             if "name" in request_data.keys():
-                driver.name = request_data['name']
+                name = request_data['name']
+                if not isinstance(name, str):
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid name"
+                    })
+                driver.name = name
 
             if "dob" in request_data.keys():
                 try:
@@ -480,7 +566,10 @@ def create_app(config_name):
 
             driver.save()
 
-            return jsonify({"response": "Driver record was updated"})
+            return jsonify({
+                "status": 200,
+                "message": "Driver record was updated"
+            })
 
     @app.route('/driver/delete', methods=['DELETE'])
     def driver_delete():
