@@ -150,7 +150,10 @@ def create_app(config_name):
 
             car.save()
 
-            return jsonify({"response": "Car record was updated"})
+            return jsonify({
+                "status": 200,
+                "message": "Car record was updated"
+            })
 
     @app.route('/car/delete', methods=['DELETE'])
     def car_delete():
@@ -316,7 +319,10 @@ def create_app(config_name):
 
             branch.save()
 
-            return jsonify({"response": "Branch record was updated"})
+            return jsonify({
+                "status": 200,
+                "message": "Branch record was updated"
+            })
 
     @app.route('/branch/delete', methods=['DELETE'])
     def branch_delete():
@@ -480,7 +486,10 @@ def create_app(config_name):
 
             driver.save()
 
-            return jsonify({"response": "Driver record was updated"})
+            return jsonify({
+                "status": "200",
+                "message": "Driver record was updated"
+            })
 
     @app.route('/driver/delete', methods=['DELETE'])
     def driver_delete():

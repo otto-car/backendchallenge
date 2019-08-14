@@ -135,8 +135,9 @@ class CarTestCase(unittest.TestCase):
         api_call(self, "POST", '/car/create', data, 200)
 
         data = dict(car_id=1, model="Model X")
-        res = self.client.put('/car/update', data=json.dumps(data), content_type='application/json')
-        self.assertEqual(res.status_code, 200)
+        json_response = api_call(self, "PUT", '/car/update', data, 200, True)
+        self.assertEqual(json_response['status'], 200)
+        self.assertEqual(json_response['message'], "Car record was updated")
 
         data = dict(car_id=1)
         res = self.client.get('/car/get', query_string=data, content_type='application/json')
@@ -145,8 +146,9 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response['model'], 'Model X')
 
         data = dict(car_id=1, model="545i", year=2015)
-        res = self.client.put('/car/update', data=json.dumps(data), content_type='application/json')
-        self.assertEqual(res.status_code, 200)
+        json_response = api_call(self, "PUT", '/car/update', data, 200, True)
+        self.assertEqual(json_response['status'], 200)
+        self.assertEqual(json_response['message'], "Car record was updated")
 
         data = dict(car_id=1)
         json_response = api_call(self, "GET", '/car/get', data, 200, True)
