@@ -31,6 +31,7 @@ class Car(db.Model):
 
     def serialize(self):
         return {
+            "id": self.id,
             "make": self.make,
             "model": self.model,
             "year": self.year,
@@ -65,6 +66,7 @@ class Branch(db.Model):
 
     def serialize(self):
         return {
+            "id": self.id,
             "city": self.city,
             "postcode": self.postcode,
             "capacity": self.capacity
@@ -95,6 +97,7 @@ class Driver(db.Model):
 
     def serialize(self):
         return {
+            "id": self.id,
             "name": self.name,
             "dob": self.dob.strftime('%d/%m/%Y')
         }
