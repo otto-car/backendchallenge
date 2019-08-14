@@ -66,13 +66,18 @@ class Branch(db.Model):
 
     def get(params):
         query = db.session.query(Branch)
-        for attr, value in params.items():
-            query = query.filter(getattr(Branch, attr) == value)
-        return db.session.query(Branch).first()
+        if "id" in params.keys():
+            query = query.filter(Branch.id == params['id'])
+        if "city" in params.keys():
+            query = query.filter(Branch.city == params['city'])
+        if "postcode" in params.keys():
+            query = query.filter(Branch.id == params['postcode'])
+        return query.first()
 
-    def get_assigned_cars_count(self):
-        query = db.session.query(Car)
-        query = query.filter(Car.assigned_type == 2, Car.assigned_id == self.id)
+    def get_assigned_cars_count(id):
+        query = db.session.query(Car.id)
+        query = query.filter(Car.assigned_type == 2)
+        query = query.filter(Car.assigned_id == id)
         return query.count()
 
     def serialize(self):

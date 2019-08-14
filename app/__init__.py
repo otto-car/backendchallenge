@@ -291,10 +291,12 @@ def create_app(config_name):
 
             # type 2 is branch
             if assigned_type == 2:
+
                 params = {"id": assigned_id}
                 branch = Branch.get(params)
+
                 if branch:
-                    occupancy = branch.get_assigned_cars_count()
+                    occupancy = branch.get_assigned_cars_count(branch.id)
                     if branch.capacity > occupancy:
                         car.assigned_type = assigned_type
                         car.assigned_id = assigned_id
@@ -442,8 +444,7 @@ def create_app(config_name):
                 params['id'] = id
 
             if "city" in request.args.keys():
-                city = request.args.get['city']
-
+                city = request.args.get('city')
                 if not isinstance(city, str):
                     return jsonify({
                         "status_code": 400,
@@ -453,7 +454,7 @@ def create_app(config_name):
                 params['city'] = city
 
             if "postcode" in request.args.keys():
-                postcode = request.args.get['postcode']
+                postcode = request.args.get('postcode')
 
                 if len(postcode) > 8:
                     return jsonify({
