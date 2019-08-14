@@ -99,7 +99,7 @@ class CarTestCase(unittest.TestCase):
     def test_can_get_car(self):
         """ Test that API can retrieve a car"""
         data = dict(make="BMW", model="530d", year=2018)
-        self.client.post('/car/create', data=json.dumps(data), content_type='application/json')
+        api_call(self, "POST", '/car/create', data, 200)
 
         data = dict(car_id=1)
         json_response = api_call(self, "GET", '/car/get', data, 200, True)
@@ -598,7 +598,7 @@ class DriverTestCase(unittest.TestCase):
     def test_can_get_driver(self):
         """ Test that API can retrieve a driver"""
         data = dict(name="Andrej Lukasov", dob="25/02/1990")
-        self.client.post('/driver/create', data=json.dumps(data), content_type='application/json')
+        api_call(self, "POST", '/driver/create', data, 200)
 
         data = dict(driver_id=1)
         json_response = api_call(self, "GET", '/driver/get', data, 200, True)
@@ -659,9 +659,7 @@ class DriverTestCase(unittest.TestCase):
         self.assertEqual(json_response['message'], "Driver record was updated")
 
         data = dict(driver_id=1)
-        res = self.client.get('/driver/get', query_string=data, content_type='application/json')
-        self.assertEqual(res.status_code, 200)
-        json_response = res.get_json()
+        json_response = api_call(self, "GET", '/driver/get', data, 200, True)
         self.assertEqual(json_response['name'], 'John Malkovich')
 
         data = dict(driver_id=1, name="Tesla Nicola", dob="12/12/2000")
