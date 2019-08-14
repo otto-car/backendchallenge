@@ -399,4 +399,31 @@ def create_app(config_name):
                 "message": "Driver created"}
             )
 
+    @app.route('/driver/get', methods=['GET'])
+    def driver_get():
+        if request.method == "GET":
+            driver_id = request.args.get('driver_id')
+
+            if not driver_id:
+                return jsonify({
+                    "status": 400,
+                    "message": "Missing driver ID"
+                })
+            try:
+                int(driver_id)
+            except:
+                return jsonify({
+                    "status": 400,
+                    "message": "Invalid driver ID"
+                })
+
+            driver = Driver.get(driver_id)
+            if not driver:
+                return jsonify({
+                    "status": 404,
+                    "message": "Driver not found"
+                })
+
+            return jsonify(driver.serialize())
+
     return app

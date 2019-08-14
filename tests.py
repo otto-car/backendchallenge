@@ -502,7 +502,7 @@ class DriverTestCase(unittest.TestCase):
 
         data = dict(driver_id=1)
         json_response = api_call(self, "GET", '/driver/get', data, 200, True)
-        self.assertEqual(json_response['namr'], 'Andrej Lukasov')
+        self.assertEqual(json_response['name'], 'Andrej Lukasov')
         self.assertEqual(json_response['dob'], '25/02/1990')
 
     def test_cant_get_driver_invalid_request(self):
