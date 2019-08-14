@@ -268,14 +268,36 @@ class CarTestCase(unittest.TestCase):
         res = self.client.get('/car/assign')
         self.assertEqual(res.status_code, 405)
 
+        data = dict(make="Tesla", model="Model 3", year=2015)
+        api_call(self, "POST", '/car/create', data, 200)
+
+        data = dict(id=1, assigned_id=1)
+        json_response = api_call(self, "POST", '/car/assign', data, 200, True)
+        self.assertEqual(json_response["status_code"], 400)
+        self.assertEqual(json_response["message"], "Missing assigned_type")
+
+        data = dict(id=1, assigned_type=1)
+        json_response = api_call(self, "POST", '/car/assign', data, 200, True)
+        self.assertEqual(json_response["status_code"], 400)
+        self.assertEqual(json_response["message"], "Missing assigned_id")
+
     def test_cant_find_a_car(self):
-        data = dict(id=1, assign_type=1, assign_id=1)
+        data = dict(id=1, assigned_type=1, assigned_id=1)
         json_response = api_call(self, "POST", '/car/assign', data, 200, True)
         self.assertEqual(json_response["status_code"], 404)
         self.assertEqual(json_response["message"], "Car not found")
 
     def test_can_assign_car_to_branch(self):
-        pass
+        data = dict(make="Tesla", model="Model 3", year=2015)
+        api_call(self, "POST", '/car/create', data, 200)
+
+        data = dict(city="London", postcode="E1W 3SS", capacity=5)
+        api_call(self, "POST", "/branch/create", data, 200, True)
+
+        data = dict(id=1, assigned_type=2, assigned_id=1)
+        json_response = api_call(self, "POST", '/car/assign', data, 200, True)
+        self.assertEqual(json_response["status_code"], 200)
+        self.assertEqual(json_response["message"], "Successfuly assigned a car")
 
     def test_wont_assign_to_branch_over_capacity(self):
         pass
