@@ -101,7 +101,7 @@ class CarTestCase(unittest.TestCase):
         data = dict(make="BMW", model="530d", year=2018)
         api_call(self, "POST", '/car/create', data, 200)
 
-        data = dict(car_id=1)
+        data = dict(id=1)
         json_response = api_call(self, "GET", '/car/get', data, 200, True)
         self.assertEqual(json_response['make'], 'BMW')
         self.assertEqual(json_response['model'], '530d')

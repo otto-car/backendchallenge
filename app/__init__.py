@@ -232,7 +232,9 @@ def create_app(config_name):
                     "message": "Invalid car ID"
                 })
 
-            car = Car.get(car_id)
+            params = {"id": car_id}
+
+            car = Car.get(params)
 
             if not car:
                 return jsonify({
