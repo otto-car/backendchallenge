@@ -227,8 +227,8 @@ def create_app(config_name):
                 city = request_data['city']
                 if not isinstance(city, str):
                     return jsonify({
-                        "status":400,
-                        "message":"Invalid city"
+                        "status": 400,
+                        "message": "Invalid city"
                     })
             else:
                 return jsonify({
@@ -340,7 +340,15 @@ def create_app(config_name):
                 })
 
             if "city" in request_data.keys():
-                branch.city = request_data['city']
+                city = request_data['city']
+
+                if not isinstance(city, str):
+                    return jsonify({
+                        "status": 400,
+                        "message": "Invalid city"
+                    })
+
+                branch.city = city
 
             if "postcode" in request_data.keys():
                 postcode = request_data['postcode']
