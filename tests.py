@@ -656,6 +656,20 @@ class DriverTestCase(unittest.TestCase):
         self.assertEqual(json_response['name'], 'Tesla Nicola')
         self.assertEqual(json_response['dob'], "12/12/2000")
 
+    def test_cant_update_driver_invalid_requests(self):
+        """" Test for correct method to be used when sending update requests"""
+        res = self.client.post('/driver/update')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.delete('/driver/update')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/driver/update')
+        self.assertEqual(res.status_code, 400)
+
+        res = self.client.get('/driver/update')
+        self.assertEqual(res.status_code, 405)
+
     def test_cant_update_driver_invalid_id(self):
         """ Test that cant update driver with ID taht doesn't exist"""
         data = dict(driver_id=257, dob="07/02/1975")
