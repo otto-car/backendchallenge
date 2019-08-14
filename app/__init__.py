@@ -213,6 +213,112 @@ def create_app(config_name):
                 "message": "Car record was updated"
             })
 
+    @app.route('/car/assign', methods=['POST'])
+    def car_assign():
+        if request.method == "POST":
+            request_data = request.get_json(force=True)
+
+            if not "id" in request_data.keys():
+                return jsonify({
+                    "status_code": 400,
+                    "message": "Missing ID"
+                })
+            params = {"id": request_data['id']}
+            car = Car.get(params)
+
+            if not car:
+                return jsonify({
+                    "status_code": 404,
+                    "message": "Car not found"
+                })
+
+            if not "assigned_type" in request_data.keys():
+                return jsonify({
+                    "status_code": 400,
+                    "message": "Missing assigned_type"
+                })
+            assigned_type = request_data["assigned_type"]
+            try:
+                int(assigned_type)
+            except:
+                return jsonify({
+                    "status_code": 400,
+                    "message": "Invalid assigned_type"
+                })
+
+            if assigned_type not in (0, 1, 2):
+                return jsonify({
+                    "status_code": 400,
+                    "message": "Invalid assigned_type"
+                })
+
+            if assigned_type == 0:
+                car.assigned_type = None
+                car.assigned_id = None
+                car.save()
+                return jsonify({
+                    "status_code": 200,
+                    "message": "Unassigned car from everything"
+                })
+
+            if not "assigned_id" in request_data.keys():
+                return jsonify({
+                    "status_code": 400,
+                    "message": "Missing assigned_id"
+                })
+
+            assigned_id = request_data["assigned_id"]
+            try:
+                int(assigned_id)
+            except:
+                return jsonify({
+                    "status_code": 400,
+                    "message": "Invalid assigned_id"
+                })
+
+            # type 1 is driver
+            if assigned_type == 1:
+                params = {"id": assigned_id}
+                driver = Driver.get(params)
+                if driver:
+                    car.assigned_type = assigned_type
+                    car.assigned_id = driver.id
+                else:
+                    return jsonify({
+                        "status_code": 404,
+                        "message": "Driver not found"
+                    })
+
+            # type 2 is branch
+            if assigned_type == 2:
+
+                params = {"id": assigned_id}
+                branch = Branch.get(params)
+
+                if branch:
+                    occupancy = branch.get_assigned_cars_count(assigned_id)
+
+                    if branch.capacity > occupancy:
+                        car.assigned_type = assigned_type
+                        car.assigned_id = assigned_id
+                    else:
+                        return jsonify({
+                            "status_code": 400,
+                            "message": "Branch has reached its capacity"
+                        })
+                else:
+                    return jsonify({
+                        "status_code": 404,
+                        "message": "Branch not found"
+                    })
+
+            car.save()
+
+            return jsonify({
+                "status_code": 200,
+                "message": "Successfully assigned a car"
+            })
+
     @app.route('/car/delete', methods=['DELETE'])
     def car_delete():
         if request.method == "DELETE":
@@ -339,8 +445,7 @@ def create_app(config_name):
                 params['id'] = id
 
             if "city" in request.args.keys():
-                city = request.args.get['city']
-
+                city = request.args.get('city')
                 if not isinstance(city, str):
                     return jsonify({
                         "status_code": 400,
@@ -350,7 +455,7 @@ def create_app(config_name):
                 params['city'] = city
 
             if "postcode" in request.args.keys():
-                postcode = request.args.get['postcode']
+                postcode = request.args.get('postcode')
 
                 if len(postcode) > 8:
                     return jsonify({

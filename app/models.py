@@ -38,8 +38,8 @@ class Car(db.Model):
             "make": self.make,
             "model": self.model,
             "year": self.year,
-            "assign_type": self.assigned_type,
-            "assign_id": self.assigned_id
+            "assigned_type": self.assigned_type,
+            "assigned_id": self.assigned_id
         }
 
 
@@ -66,9 +66,19 @@ class Branch(db.Model):
 
     def get(params):
         query = db.session.query(Branch)
-        for attr, value in params.items():
-            query = query.filter(getattr(Branch, attr) == value)
-        return db.session.query(Branch).first()
+        if "id" in params.keys():
+            query = query.filter(Branch.id == params['id'])
+        if "city" in params.keys():
+            query = query.filter(Branch.city == params['city'])
+        if "postcode" in params.keys():
+            query = query.filter(Branch.id == params['postcode'])
+        return query.first()
+
+    def get_assigned_cars_count(self, id):
+        query = db.session.query(Car.id)
+        query = query.filter(Car.assigned_type == 2)
+        query = query.filter(Car.assigned_id == id)
+        return query.count()
 
     def serialize(self):
         return {
