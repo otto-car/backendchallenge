@@ -45,16 +45,31 @@ class CarTestCase(unittest.TestCase):
         json_response = api_call(self, "POST", '/car/create', None, 200)
         self.assertEqual(json_response, None)
 
-        data = dict(make="Tesla", model="Model 3", year="Stringy McStringface")
-        json_response = api_call(self, "POST", "/car/create", data, 200, True)
-        self.assertEqual(json_response['status'], 400)
-        self.assertEqual(json_response['message'], 'Invalid year')
+        res = self.client.post('/car/create')
+        self.assertEqual(res.status_code, 400)
 
-    def test_cant_create_car_missing_params(self):
+        res = self.client.post('/car/create', data=None, content_type='application/json')
+        self.assertEqual(res.status_code, 400)
+
+        res = self.client.get('/car/create')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.delete('/car/create')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/car/create')
+        self.assertEqual(res.status_code, 405)
+
+    def test_cant_create_car_missing_invalid_params(self):
         """ Test that API will return expected errors when params are missing"""
         json_response = api_call(self, "POST", "/car/create", dict(), 200, True)
         self.assertEqual(json_response['status'], 400)
         self.assertEqual(json_response['message'], 'Missing make')
+
+        data = dict(make="Tesla", model="Model 3", year="Stringy McStringface")
+        json_response = api_call(self, "POST", "/car/create", data, 200, True)
+        self.assertEqual(json_response['status'], 400)
+        self.assertEqual(json_response['message'], 'Invalid year')
 
         data = dict(model="Model 3", year=2018)
         json_response = api_call(self, "POST", "/car/create", data, 200, True)
@@ -245,6 +260,9 @@ class BranchTestCase(unittest.TestCase):
 
     def test_cant_create_branch_invalid_request(self):
         """ Test cant create branch with invalid requests"""
+        json_response = api_call(self, "POST", '/branch/create', None, 200)
+        self.assertEqual(json_response, None)
+
         res = self.client.post('/branch/create')
         self.assertEqual(res.status_code, 400)
 
@@ -252,6 +270,12 @@ class BranchTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 400)
 
         res = self.client.get('/branch/create')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.delete('/branch/create')
+        self.assertEqual(res.status_code, 405)
+
+        res = self.client.put('/branch/create')
         self.assertEqual(res.status_code, 405)
 
     def test_cant_create_branch_missing_or_invalid_params(self):
