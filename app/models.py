@@ -26,8 +26,11 @@ class Car(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    def get(car_id):
-        return db.session.query(Car).filter(Car.id == car_id).first()
+    def get(params):
+        query = db.session.query(Car)
+        for attr, value in params.items():
+            query = query.filter(getattr(Car, attr) == value)
+        return db.session.query(Car).first()
 
     def serialize(self):
         return {
