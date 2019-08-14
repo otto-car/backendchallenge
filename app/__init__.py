@@ -481,4 +481,40 @@ def create_app(config_name):
             driver.save()
 
             return jsonify({"response": "Driver record was updated"})
+
+    @app.route('/driver/delete', methods=['DELETE'])
+    def driver_delete():
+        if request.method == "DELETE":
+
+            if not "driver_id" in request.args:
+                return jsonify({
+                    "status": 400,
+                    "message": "Missing driver ID"
+                })
+
+            driver_id = request.args.get("driver_id")
+
+            try:
+                int(driver_id)
+            except:
+                return jsonify({
+                    "status": 400,
+                    "message": "Invalid driver ID"
+                })
+
+            driver = Driver.get(driver_id)
+
+            if not driver:
+                return jsonify({
+                    "status": 404,
+                    "message": "Driver not found"
+                })
+
+            driver.delete()
+
+            return jsonify({
+                "status": 200,
+                "message": "Driver deleted"
+            })
+
     return app

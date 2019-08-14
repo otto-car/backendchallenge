@@ -584,7 +584,7 @@ class DriverTestCase(unittest.TestCase):
 
     def test_can_delete_driver(self):
         """ Test can delete driver """
-        data = dict(name="Nicola Tesla", dob="12/23/1983")
+        data = dict(name="Nicola Tesla", dob="23/12/1983")
         api_call(self, "POST", '/driver/create', data, 200)
 
         data = dict(driver_id=1)
