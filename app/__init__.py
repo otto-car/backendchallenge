@@ -216,13 +216,22 @@ def create_app(config_name):
     @app.route('/car/assign', methods=['POST'])
     def car_assign():
         if request.method == "POST":
+            request_data = request.get_json(force=True)
 
-            if not "id" in request.args:
+            if not "id" in request_data.keys():
                 return jsonify({
                     "status_code": 400,
                     "message": "Missing ID"
                 })
-            id = request.args.get("id")
+            params = {"id": request_data['id']}
+            car = Car.get(params)
+            if not car:
+                return jsonify({
+                    "status_code": 404,
+                    "message": "Car not found"
+                })
+
+
 
             return jsonify({
                 "status_code": 200,

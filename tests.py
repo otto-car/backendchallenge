@@ -268,6 +268,12 @@ class CarTestCase(unittest.TestCase):
         res = self.client.get('/car/assign')
         self.assertEqual(res.status_code, 405)
 
+    def test_cant_find_a_car(self):
+        data = dict(id=1, assign_type=1, assign_id=1)
+        json_response = api_call(self, "POST", '/car/assign', data, 200, True)
+        self.assertEqual(json_response["status_code"], 404)
+        self.assertEqual(json_response["message"], "Car not found")
+
     def test_can_assign_car_to_branch(self):
         pass
 
