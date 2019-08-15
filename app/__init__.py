@@ -1,10 +1,10 @@
-from flask_api import FlaskAPI
+from flask_api import FlaskAPI, exceptions
 from flask_sqlalchemy import SQLAlchemy
 from instance.config import app_config
-from flask import request, jsonify, abort
+from flask import request, jsonify
 import re
 import datetime
-from datetime import date
+from app import helpers
 
 db = SQLAlchemy()
 
@@ -21,117 +21,25 @@ def create_app(config_name):
     @app.route('/car/create', methods=['POST'])
     def car_create():
         if request.method == "POST":
-            request_data = request.get_json(force=True)
+            if request.data is None:
+                return jsonify({"status_code": 400, "message": "Invalid request"})
+            request_data = request.data
 
-            if request_data is None:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Invalid request"
-                })
-
-            # Make, model and year are necessary in order to create a car object
-            if "make" in request_data.keys():
-                make = request_data['make']
-            else:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Missing make"
-                })
-
-            if "model" in request_data.keys():
-                model = request_data['model']
-            else:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Missing model"
-                })
-
-            if "year" in request_data.keys():
-                try:
-                    int(request_data['year'])
-                    if len(str(request_data['year'])) != 4:
-                        return jsonify({
-                            "status_code": 400,
-                            "message": "Invalid year"
-                        })
-                    year = request_data['year']
-                except:
-                    return jsonify({
-                        "status_code": 400,
-                        "message": "Invalid year"
-                    })
-            else:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Missing year"
-                })
-
-            if "assigned_type" in request_data.keys():
-                assigned_type = request_data['assigned_type']
-            else:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Missing assigned_type"
-                })
-            if assigned_type not in (1,2):
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Invalid assigned type"
-                })
-
-            if "assigned_id" in request_data.keys():
-                assigned_id = request_data['assigned_id']
-            else:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Missing assigned_id"
-                })
             try:
-                int(assigned_id)
-            except:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Invalid assigned_id"
-                })
+                make = helpers.check_missing('list', request_data, 'make')
+                model = helpers.check_missing('list', request_data, 'model')
+                year = helpers.check_missing('list', request_data, 'year')
+                year = helpers.check_correct_year(year)
+                assigned_type = helpers.check_missing('list', request_data, 'assigned_type')
+                assigned_id = helpers.check_missing('list', request_data, 'assigned_id')
+                assigned_id = helpers.check_int(assigned_id, 'assigned_id')
+                assigned_type, assigned_id = helpers.validate_assigning(assigned_type, assigned_id)
 
-            # type 1 is driver
-            if assigned_type == 1:
-                params = {"id": assigned_id}
-                driver = Driver.get(params)
-                if driver:
-                    assigned_id = driver.id
-                else:
-                    return jsonify({
-                        "status_code": 404,
-                        "message": "Driver not found"
-                    })
-
-            # type 2 is branch
-            if assigned_type == 2:
-                params = {"id": assigned_id}
-                branch = Branch.get(params)
-
-                if branch:
-                    occupancy = branch.get_assigned_cars_count(assigned_id)
-                    if branch.capacity > occupancy:
-                        assigned_id = assigned_id
-                    else:
-                        return jsonify({
-                            "status_code": 400,
-                            "message": "Branch has reached its capacity"
-                        })
-                else:
-                    return jsonify({
-                        "status_code": 404,
-                        "message": "Branch not found"
-                    })
-
-            car = Car(make, model, year, assigned_type, assigned_id)
-            car.save()
-            return jsonify({
-                "status_code": 201,
-                "message": "Car created"}
-            )
+                car = Car(make, model, year, assigned_type, assigned_id)
+                car.save()
+                return jsonify({"status_code": 201, "message": "Car created"})
+            except Exception as e:
+                return jsonify({"status_code": e.args[0]['status_code'], "message": e.args[0]['message']})
 
     @app.route('/car/get', methods=['GET'])
     def car_get():
