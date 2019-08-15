@@ -656,7 +656,7 @@ class DriverTestCase(unittest.TestCase):
         data = dict(id="abcd")
         json_response = api_call(self, "GET", '/driver/get', data, 200, True)
         self.assertEqual(json_response["status_code"], 400)
-        self.assertEqual(json_response["message"], "Invalid ID")
+        self.assertEqual(json_response["message"], "Invalid id")
 
     def test_can_update_driver(self):
         """ Test for updating driver details"""

@@ -236,54 +236,31 @@ def create_app(config_name):
     def driver_get():
         if request.method == "GET":
             if request.args is None:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Invalid request"
-                })
+                return jsonify({"status_code": 400, "message": "Invalid request"})
 
-            params = {}
+            try:
+                params = {}
+                if "id" in request.args.keys():
+                    params['id'] = helpers.validate_int(request.args.get('id'), 'id')
+                if "first_name" in request.args.keys():
+                    params["first_name"] = helpers.validate_string(request.args.get('first_name'), 'first_name')
 
-            if "id" in request.args.keys():
-                id = request.args.get('id')
+                if "middle_name" in request.args.keys():
+                    params["middle_name"] = helpers.validate_string(request.args.get('middle_name'), 'middle_name')
 
-                try:
-                    int(id)
-                except:
-                    return jsonify({
-                        "status_code": 400,
-                        "message": "Invalid ID"
-                    })
+                if "last_name" in request.args.keys():
+                    params["last_name"] = helpers.validate_string(request.args.get('last_name'), 'last_name')
+                if "dob" in request.args.keys():
+                    params["dob"] = helpers.validate_dob(request.args.get('dob'))
 
-                params['id'] = id
-
-            if "first_name" in request.args.keys():
-                params["first_name"] = request.args.get('first_name')
-
-            if "middle_name" in request.args.keys():
-                params["middle_name"] = request.args.get('middle_name')
-
-            if "last_name" in request.args.keys():
-                params["last_name"] = request.args.get('last_name')
-
-            if "dob" in request.args.keys():
-                dob = datetime.datetime.strptime(request.args.get('dob'), '%d/%m/%Y')
-                params["dob"] = dob.strftime("%m/%d/%Y")
-
-            if not params:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Invalid request"
-                })
-
-            driver = Driver.get(params)
-
-            if not driver:
-                return jsonify({
-                    "status_code": 404,
-                    "message": "Driver not found"
-                })
-
-            return jsonify(driver.serialize())
+                if not params:
+                    return jsonify({"status_code": 400, "message": "Invalid request"})
+                driver = Driver.get(params)
+                if not driver:
+                    return jsonify({"status_code": 404, "message": "Driver not found"})
+                return jsonify(driver.serialize())
+            except Exception as e:
+                return jsonify({"status_code": e.args[0]['status_code'], "message": e.args[0]['message']})
 
     @app.route('/driver/update', methods=['PUT'])
     def driver_update():
