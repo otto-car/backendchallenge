@@ -110,7 +110,8 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response["status_code"], 400)
         self.assertEqual(json_response["message"], 'Missing assigned_id')
 
-        json_response = api_call(self, "POST", "/car/create", dict(make="Tesla", model="Model 3", year=2018, assigned_id=1), 200, True)
+        json_response = api_call(self, "POST", "/car/create",
+                                 dict(make="Tesla", model="Model 3", year=2018, assigned_id=1), 200, True)
         self.assertEqual(json_response["status_code"], 400)
         self.assertEqual(json_response["message"], 'Missing assigned_type')
 
@@ -230,7 +231,7 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response['assigned_type'], 1)
         self.assertEqual(json_response['assigned_id'], 1)
 
-        api_call(self, "PUT", '/car/update', dict(id=2,make="Mercedes", model="E-Class", year=2019), 200, True)
+        api_call(self, "PUT", '/car/update', dict(id=2, make="Mercedes", model="E-Class", year=2019), 200, True)
         json_response = api_call(self, "GET", '/car/get', dict(id=2), 200, True)
         self.assertEqual(json_response['make'], "Mercedes")
         self.assertEqual(json_response['model'], "E-Class")

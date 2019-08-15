@@ -67,7 +67,6 @@ def create_app(config_name):
                 if not params:
                     raise Exception({"status_code": 400, "message": "Invalid request"})
 
-
                 car = Car.get(params)
                 if not car:
                     raise Exception({"status_code": 404, "message": "Car not found"})
@@ -101,7 +100,8 @@ def create_app(config_name):
                 elif "assigned_id" in request_data.keys() and not "assigned_type" in request_data.keys():
                     raise Exception({"status_code": 400, "message": "Missing assigned_type"})
                 elif set(("assigned_type", "assigned_id")) <= request_data.keys():
-                    assigned_type, assigned_id = helpers.validate_assigning(request_data['assigned_type'], request_data['assigned_id'])
+                    assigned_type, assigned_id = helpers.validate_assigning(request_data['assigned_type'],
+                                                                            request_data['assigned_id'])
                     car.assigned_type = assigned_type
                     car.assigned_id = assigned_id
                 car.save()
@@ -314,7 +314,7 @@ def create_app(config_name):
                 if not driver:
                     return jsonify({"status_code": 404, "message": "Driver not found"})
                 driver.delete()
-                return jsonify({"status_code": 200,"message": "Driver deleted"})
+                return jsonify({"status_code": 200, "message": "Driver deleted"})
             except Exception as e:
                 return jsonify({"status_code": e.args[0]['status_code'], "message": e.args[0]['message']})
 
