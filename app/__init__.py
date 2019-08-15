@@ -153,6 +153,8 @@ def create_app(config_name):
                     params['city'] = helpers.validate_string(request.args.get('city'), 'city')
                 if "postcode" in request.args.keys():
                     params['postcode'] = helpers.validate_postcode(request.args.get('postcode'))
+                if "capacity" in request.args.keys():
+                    params['capacity'] = helpers.validate_int(request.args.get('capacity'), 'capacity')
                 if not params:
                     return jsonify({"status_code": 400, "message": "Invalid request"})
                 branch = Branch.get(params)
@@ -166,80 +168,27 @@ def create_app(config_name):
     @app.route('/branch/update', methods=['PUT'])
     def branch_update():
         if request.method == "PUT":
-            request_data = request.get_json(force=True)
-
-            if request_data is None:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Invalid request"
-                })
-
-            if "id" not in request_data.keys():
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Missing ID"
-                })
-
-            id = request_data['id']
+            if request.data is None:
+                return jsonify({"status_code": 400, "message": "Invalid request"})
+            request_data = request.data
 
             try:
-                int(id)
-            except:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Invalid ID"
-                })
-            params = {"id": id}
-            branch = Branch.get(params)
-
-            if not branch:
-                return jsonify({
-                    "status_code": 404,
-                    "message": "Branch not found"
-                })
-
-            if "city" in request_data.keys():
-                city = request_data['city']
-
-                if not isinstance(city, str):
-                    return jsonify({
-                        "status_code": 400,
-                        "message": "Invalid city"
-                    })
-
-                branch.city = city
-
-            if "postcode" in request_data.keys():
-                postcode = request_data['postcode']
-                if len(postcode) > 8:
-                    return jsonify({
-                        "status_code": 400,
-                        "message": "Invalid postcode"
-                    })
-                pattern = re.compile(r'\b[A-Z]{1,2}[0-9][A-Z0-9]? [0-9][ABD-HJLNP-UW-Z]{2}\b')
-                if not pattern.match(postcode):
-                    return jsonify({
-                        "status_code": 400,
-                        "message": "Invalid postcode"
-                    })
-                branch.postcode = request_data['postcode']
-
-            if "capacity" in request_data.keys():
-                try:
-                    int(request_data['capacity'])
-                    branch.capacity = request_data['capacity']
-                except:
-                    return jsonify({
-                        "status_code": 400,
-                        "message": "Invalid capacity"
-                    })
-
-            branch.save()
-
-            return jsonify({
-                "status_code": 200,
-                "message": "Branch record was updated"
-            })
+                id = helpers.check_missing('list', request_data, 'id')
+                id = helpers.validate_int(id, 'id')
+                params = {"id": id}
+                branch = Branch.get(params)
+                if not branch:
+                    return jsonify({"status_code": 404, "message": "Branch not found"})
+                if "city" in request_data.keys():
+                    branch.city = helpers.validate_string(request_data['city'], 'city')
+                if "postcode" in request_data.keys():
+                    branch.postcode = helpers.validate_postcode(request_data['postcode'])
+                if "capacity" in request_data.keys():
+                    branch.capacity = helpers.validate_int(request_data['capacity'], 'capacity')
+                branch.save()
+                return jsonify({"status_code": 200, "message": "Branch record was updated"})
+            except Exception as e:
+                return jsonify({"status_code": e.args[0]['status_code'], "message": e.args[0]['message']})
 
     @app.route('/branch/delete', methods=['DELETE'])
     def branch_delete():
