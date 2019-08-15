@@ -558,10 +558,10 @@ class DriverTestCase(unittest.TestCase):
         self.assertEqual(json_response, None)
 
         res = self.client.post('/driver/create')
-        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.status_code, 200)
 
         res = self.client.post('/driver/create', data=None, content_type='application/json')
-        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.status_code, 200)
 
         res = self.client.get('/driver/create')
         self.assertEqual(res.status_code, 405)
@@ -577,32 +577,32 @@ class DriverTestCase(unittest.TestCase):
         data = dict()
         json_response = api_call(self, "POST", "/driver/create", data, 200, True)
         self.assertEqual(json_response["status_code"], 400)
-        self.assertEqual(json_response["message"], "Missing name")
+        self.assertEqual(json_response["message"], "Missing first_name")
 
         data = dict(dob="23/06/1962")
         json_response = api_call(self, "POST", "/driver/create", data, 200, True)
         self.assertEqual(json_response["status_code"], 400)
-        self.assertEqual(json_response["message"], "Missing name")
+        self.assertEqual(json_response["message"], "Missing first_name")
 
         data = dict(first_name="Alan", last_name="Turing")
         json_response = api_call(self, "POST", "/driver/create", data, 200, True)
         self.assertEqual(json_response["status_code"], 400)
-        self.assertEqual(json_response["message"], "Missing DOB")
+        self.assertEqual(json_response["message"], "Missing dob")
 
         data = dict(first_name="Alan", last_name="Turing", dob="23/06/2025")
         json_response = api_call(self, "POST", "/driver/create", data, 200, True)
         self.assertEqual(json_response["status_code"], 400)
-        self.assertEqual(json_response["message"], "Invalid DOB")
+        self.assertEqual(json_response["message"], "Invalid dob")
 
         data = dict(first_name="Alan", last_name="Turing", dob="23 June")
         json_response = api_call(self, "POST", "/driver/create", data, 200, True)
         self.assertEqual(json_response["status_code"], 400)
-        self.assertEqual(json_response["message"], "Invalid DOB")
+        self.assertEqual(json_response["message"], "Invalid dob")
 
         data = dict(first_name="Alan", last_name="Turing", dob="never")
         json_response = api_call(self, "POST", "/driver/create", data, 200, True)
         self.assertEqual(json_response["status_code"], 400)
-        self.assertEqual(json_response["message"], "Invalid DOB")
+        self.assertEqual(json_response["message"], "Invalid dob")
 
     def test_can_get_driver(self):
         """ Test that API can retrieve a driver"""

@@ -1,4 +1,5 @@
 import re
+import datetime
 UK_POSTCODE_PATTERN = r'\b[A-Z]{1,2}[0-9][A-Z0-9]?( )?[0-9][ABD-HJLNP-UW-Z]{2}\b'
 
 
@@ -48,6 +49,18 @@ def validate_postcode(postcode):
     if not pattern.match(postcode):
         raise Exception({"status_code": 400, "message": "Invalid postcode"})
     return postcode.upper()
+
+
+def validate_dob(dob):
+    try:
+        dob = datetime.datetime.strptime(dob, '%d/%m/%Y')
+        # Won't let drivers below age 18 to pass validation
+        min_age = datetime.timedelta(weeks=52 * 18)
+        if datetime.datetime.now() - dob < min_age:
+            raise Exception({"status_code": 400, "message": "Invalid dob"})
+        return dob.strftime("%m/%d/%Y")
+    except:
+        raise Exception({"status_code": 400, "message": "Invalid dob"})
 
 
 def validate_assigning(assigned_type, assigned_id):

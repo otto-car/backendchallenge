@@ -212,80 +212,25 @@ def create_app(config_name):
     @app.route('/driver/create', methods=['POST'])
     def driver_create():
         if request.method == "POST":
-            request_data = request.get_json(force=True)
+            if request.data is None:
+                return jsonify({"status_code": 400, "message": "Invalid request"})
+            request_data = request.data
 
-            if request_data is None:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Invalid request"
-                })
-
-            if "first_name" in request_data.keys():
-                first_name = request_data['first_name']
-                if not isinstance(first_name, str):
-                    return jsonify({
-                        "status_code": 400,
-                        "message": "Invalid first_name"
-                    })
-            else:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Missing name"
-                })
-
-            middle_name = None
-            if "middle_name" in request_data.keys():
-                middle_name = request_data['middle_name']
-                if not isinstance(middle_name, str):
-                    return jsonify({
-                        "status_code": 400,
-                        "message": "Invalid middle_name"
-                    })
-
-            if "last_name" in request_data.keys():
-                last_name = request_data['last_name']
-                if not isinstance(last_name, str):
-                    return jsonify({
-                        "status_code": 400,
-                        "message": "Invalid last_name"
-                    })
-            else:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Missing name"
-                })
-
-            if "dob" in request_data.keys():
-                try:
-                    dob = datetime.datetime.strptime(request_data['dob'], '%d/%m/%Y')
-
-                    # Won't let drivers below age 18 to join
-                    min_age = datetime.timedelta(weeks=52 * 18)
-                    if datetime.datetime.now() - dob < min_age:
-                        return jsonify({
-                            "status_code": 400,
-                            "message": "Invalid DOB"
-                        })
-
-                    dob = dob.strftime("%m/%d/%Y")
-
-                except:
-                    return jsonify({
-                        "status_code": 400,
-                        "message": "Invalid DOB"
-                    })
-            else:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Missing DOB"
-                })
-
-            driver = Driver(first_name, middle_name, last_name, dob)
-            driver.save()
-            return jsonify({
-                "status_code": 201,
-                "message": "Driver created"}
-            )
+            try:
+                first_name = helpers.check_missing('list', request_data, 'first_name')
+                first_name = helpers.validate_string(first_name, 'first_name')
+                middle_name = None
+                if "middle_name" in request_data.keys():
+                    middle_name = helpers.validate_string(request_data['middle_name'], 'middle_name')
+                last_name = helpers.check_missing('list', request_data, 'last_name')
+                last_name = helpers.validate_string(last_name, 'last_name')
+                dob = helpers.check_missing('list', request_data, 'dob')
+                dob = helpers.validate_dob(dob)
+                driver = Driver(first_name, middle_name, last_name, dob)
+                driver.save()
+                return jsonify({"status_code": 201, "message": "Driver created"})
+            except Exception as e:
+                return jsonify({"status_code": e.args[0]['status_code'], "message": e.args[0]['message']})
 
     @app.route('/driver/get', methods=['GET'])
     def driver_get():
