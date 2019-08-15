@@ -204,39 +204,22 @@ def create_app(config_name):
     @app.route('/car/delete', methods=['DELETE'])
     def car_delete():
         if request.method == "DELETE":
-
-            if not "id" in request.args:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Missing ID"
-                })
-
-            id = request.args.get("id")
+            if request.args is None:
+                return jsonify({"status_code": 400, "message": "Invalid request"})
 
             try:
-                int(id)
-            except:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Invalid ID"
-                })
+                id = helpers.check_missing('args', request, 'id')
+                id = helpers.validate_int(id, 'id')
 
-            params = {"id": id}
+                params = {"id": id}
+                car = Car.get(params)
+                if not car:
+                    return jsonify({"status_code": 404, "message": "Car not found"})
 
-            car = Car.get(params)
-
-            if not car:
-                return jsonify({
-                    "status_code": 404,
-                    "message": "Car not found"
-                })
-
-            car.delete()
-
-            return jsonify({
-                "status_code": 200,
-                "message": "Car deleted"
-            })
+                car.delete()
+                return jsonify({"status_code": 200, "message": "Car deleted"})
+            except Exception as e:
+                return jsonify({"status_code": e.args[0]['status_code'], "message": e.args[0]['message']})
 
     @app.route('/branch/create', methods=['POST'])
     def branch_create():

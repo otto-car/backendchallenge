@@ -258,14 +258,14 @@ class CarTestCase(unittest.TestCase):
         data = dict(id="i_love_pizza")
         json_response = api_call(self, "DELETE", '/car/delete', data, 200, True)
         self.assertEqual(json_response["status_code"], 400)
-        self.assertEqual(json_response["message"], "Invalid ID")
+        self.assertEqual(json_response["message"], "Invalid id")
 
     def test_cant_delete_car_invalid_request(self):
         """ Test we can't delete car with bad request"""
         data = dict()
         json_response = api_call(self, "DELETE", '/car/delete', data, 200, True)
         self.assertEqual(json_response["status_code"], 400)
-        self.assertEqual(json_response["message"], 'Missing ID')
+        self.assertEqual(json_response["message"], 'Missing id')
 
         res = self.client.post('/car/delete')
         self.assertEqual(res.status_code, 405)
