@@ -265,93 +265,30 @@ def create_app(config_name):
     @app.route('/driver/update', methods=['PUT'])
     def driver_update():
         if request.method == "PUT":
-            request_data = request.get_json(force=True)
-
-            if request_data is None:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Invalid request"
-                })
-
-            if "id" not in request_data.keys():
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Missing ID"
-                })
-
-            id = request_data['id']
+            if request.data is None:
+                return jsonify({"status_code": 400, "message": "Invalid request"})
+            request_data = request.data
 
             try:
-                int(id)
-            except:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Invalid ID"
-                })
+                id = helpers.check_missing('list', request_data, 'id')
+                id = helpers.validate_int(id, 'id')
+                params = {"id": id}
+                driver = Driver.get(params)
+                if not driver:
+                    return jsonify({"status_code": 404, "message": "Driver not found"})
 
-            params = {"id": id}
-            driver = Driver.get(params)
-
-            if not driver:
-                return jsonify({
-                    "status_code": 404,
-                    "message": "Driver not found"
-                })
-
-            if "first_name" in request_data.keys():
-                first_name = request_data['first_name']
-                if not isinstance(first_name, str):
-                    return jsonify({
-                        "status_code": 400,
-                        "message": "Invalid first_name"
-                    })
-                driver.first_name = first_name
-
-            if "middle_name" in request_data.keys():
-                middle_name = request_data['middle_name']
-                if not isinstance(middle_name, str):
-                    return jsonify({
-                        "status_code": 400,
-                        "message": "Invalid middle_name"
-                    })
-                driver.middle_name = middle_name
-
-            if "last_name" in request_data.keys():
-                last_name = request_data['last_name']
-                if not isinstance(last_name, str):
-                    return jsonify({
-                        "status_code": 400,
-                        "message": "Invalid last_name"
-                    })
-                driver.last_name = last_name
-
-
-            if "dob" in request_data.keys():
-                try:
-                    dob = datetime.datetime.strptime(request_data['dob'], '%d/%m/%Y')
-
-                    # Won't let drivers below age 18 to join
-                    min_age = datetime.timedelta(weeks=52 * 18)
-                    if datetime.datetime.now() - dob < min_age:
-                        return jsonify({
-                            "status_code": 400,
-                            "message": "Invalid DOB"
-                        })
-
-                    driver.dob = request_data['dob']
-
-                except:
-                    return jsonify({
-                        "status_code": 400,
-                        "message": "Invalid DOB"
-                    })
-
-            driver.save()
-
-            return jsonify({
-                "status_code": 200,
-                "message": "Driver record was updated"
-            })
+                if "first_name" in request_data.keys():
+                    driver.first_name = helpers.validate_string(request_data['first_name'], 'first_name')
+                if "middle_name" in request_data.keys():
+                    driver.middle_name = helpers.validate_string(request_data['middle_name'], 'middle_name')
+                if "last_name" in request_data.keys():
+                    driver.last_name = helpers.validate_string(request_data['last_name'], 'last_name')
+                if "dob" in request_data.keys():
+                    driver.dob = helpers.validate_dob(request_data["dob"])
+                driver.save()
+                return jsonify({"status_code": 200, "message": "Driver record was updated"})
+            except Exception as e:
+                return jsonify({"status_code": e.args[0]['status_code'], "message": e.args[0]['message']})
 
     @app.route('/driver/delete', methods=['DELETE'])
     def driver_delete():

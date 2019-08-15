@@ -695,7 +695,7 @@ class DriverTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 405)
 
         res = self.client.put('/driver/update')
-        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.status_code, 200)
 
         res = self.client.get('/driver/update')
         self.assertEqual(res.status_code, 405)
@@ -712,12 +712,12 @@ class DriverTestCase(unittest.TestCase):
         data = dict(name="Henry Ford")
         json_response = api_call(self, "PUT", '/driver/update', data, 200, True)
         self.assertEqual(json_response["status_code"], 400)
-        self.assertEqual(json_response["message"], "Missing ID")
+        self.assertEqual(json_response["message"], "Missing id")
 
         data = dict(id="cowabunga!", name="Eminem McRapburger")
         json_response = api_call(self, "PUT", '/driver/update', data, 200, True)
         self.assertEqual(json_response["status_code"], 400)
-        self.assertEqual(json_response["message"], "Invalid ID")
+        self.assertEqual(json_response["message"], "Invalid id")
 
     def test_can_delete_driver(self):
         """ Test can delete driver """
