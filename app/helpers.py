@@ -1,5 +1,5 @@
 import re
-UK_POSTCODE_PATTERN = r'\b[A-Z]{1,2}[0-9][A-Z0-9]? [0-9][ABD-HJLNP-UW-Z]{2}\b'
+UK_POSTCODE_PATTERN = r'\b[A-Z]{1,2}[0-9][A-Z0-9]?( )?[0-9][ABD-HJLNP-UW-Z]{2}\b'
 
 
 # Helper function for validating missing fields
@@ -47,7 +47,7 @@ def validate_postcode(postcode):
     pattern = re.compile(UK_POSTCODE_PATTERN)
     if not pattern.match(postcode):
         raise Exception({"status_code": 400, "message": "Invalid postcode"})
-    return postcode
+    return postcode.upper()
 
 
 def validate_assigning(assigned_type, assigned_id):
