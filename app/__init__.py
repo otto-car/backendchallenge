@@ -34,7 +34,6 @@ def create_app(config_name):
                 assigned_id = helpers.check_missing('list', request_data, 'assigned_id')
                 assigned_id = helpers.validate_int(assigned_id, 'assigned_id')
                 assigned_type, assigned_id = helpers.validate_assigning(assigned_type, assigned_id)
-
                 car = Car(make, model, year, assigned_type, assigned_id)
                 car.save()
                 return jsonify({"status_code": 201, "message": "Car created"})
@@ -76,7 +75,6 @@ def create_app(config_name):
             try:
                 id = helpers.check_missing('list', request_data, 'id')
                 id = helpers.validate_int(id, 'id')
-
                 params = {"id": id}
                 car = Car.get(params)
                 if not car:
@@ -111,7 +109,6 @@ def create_app(config_name):
             try:
                 id = helpers.check_missing('args', request, 'id')
                 id = helpers.validate_int(id, 'id')
-
                 params = {"id": id}
                 car = Car.get(params)
                 if not car:
@@ -146,67 +143,25 @@ def create_app(config_name):
     def branch_get():
         if request.method == "GET":
             if request.args is None:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Invalid request"
-                })
+                return jsonify({"status_code": 400, "message": "Invalid request"})
 
-            params = {}
-            if "id" in request.args.keys():
-                id = request.args.get('id')
+            try:
+                params = {}
+                if "id" in request.args.keys():
+                    params['id'] = helpers.validate_int(request.args.get('id'), 'id')
+                if "city" in request.args.keys():
+                    params['city'] = helpers.validate_string(request.args.get('city'), 'city')
+                if "postcode" in request.args.keys():
+                    params['postcode'] = helpers.validate_postcode(request.args.get('postcode'))
+                if not params:
+                    return jsonify({"status_code": 400, "message": "Invalid request"})
+                branch = Branch.get(params)
+                if not branch:
+                    return jsonify({"status_code": 404, "message": "Branch not found"})
+                return jsonify(branch.serialize())
 
-                try:
-                    int(id)
-                except:
-                    return jsonify({
-                        "status_code": 400,
-                        "message": "Invalid ID"
-                    })
-
-                params['id'] = id
-
-            if "city" in request.args.keys():
-                city = request.args.get('city')
-                if not isinstance(city, str):
-                    return jsonify({
-                        "status_code": 400,
-                        "message": "Invalid city"
-                    })
-
-                params['city'] = city
-
-            if "postcode" in request.args.keys():
-                postcode = request.args.get('postcode')
-
-                if len(postcode) > 8:
-                    return jsonify({
-                        "status_code": 400,
-                        "message": "Invalid postcode"
-                    })
-
-                pattern = re.compile(r'\b[A-Z]{1,2}[0-9][A-Z0-9]? [0-9][ABD-HJLNP-UW-Z]{2}\b')
-                if not pattern.match(postcode):
-                    return jsonify({
-                        "status_code": 400,
-                        "message": "Invalid postcode"
-                    })
-
-                params["postcode"] = postcode
-
-            if not params:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Invalid request"
-                })
-
-            branch = Branch.get(params)
-            if not branch:
-                return jsonify({
-                    "status_code": 404,
-                    "message": "Branch not found"
-                })
-
-            return jsonify(branch.serialize())
+            except Exception as e:
+                return jsonify({"status_code": e.args[0]['status_code'], "message": e.args[0]['message']})
 
     @app.route('/branch/update', methods=['PUT'])
     def branch_update():
