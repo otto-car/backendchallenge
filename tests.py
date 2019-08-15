@@ -140,19 +140,19 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         json_response = res.get_json()
         self.assertEqual(json_response["status_code"], 400)
-        self.assertEqual(json_response["message"], 'Invalid request')
+        self.assertEqual(json_response["message"], "Invalid request")
 
     def test_cant_get_car_missing_params(self):
         """ Test that endpoint can deal with empty param"""
         data = dict()
         json_response = api_call(self, "GET", '/car/get', data, 200, True)
         self.assertEqual(json_response["status_code"], 400)
-        self.assertEqual(json_response["message"], 'Invalid request')
+        self.assertEqual(json_response["message"], "Invalid request")
 
         data = dict(id=None)
         json_response = api_call(self, "GET", '/car/get', data, 200, True)
         self.assertEqual(json_response["status_code"], 400)
-        self.assertEqual(json_response["message"], 'Invalid request')
+        self.assertEqual(json_response["message"], "Invalid request")
 
     def test_cant_get_car_id_doesnt_exist(self):
         """ Test can't get car ID that doesn't exist"""
@@ -166,7 +166,7 @@ class CarTestCase(unittest.TestCase):
         data = dict(id="abcd")
         json_response = api_call(self, "GET", '/car/get', data, 200, True)
         self.assertEqual(json_response["status_code"], 400)
-        self.assertEqual(json_response["message"], 'Invalid ID')
+        self.assertEqual(json_response["message"], 'Invalid id')
 
     def test_can_update_car(self):
         """ Test for updating car details"""

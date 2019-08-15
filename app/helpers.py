@@ -1,7 +1,10 @@
 # Helper function for validating missing fields
 def check_missing(format, data, field):
-    if format == "json":
-        pass
+    if format == "args":
+        if field in data.args.keys():
+            return data.args.get(field)
+        else:
+            raise Exception({"status_code": 400, "message": "Missing " + field})
     if format == "list":
         if field in data.keys():
             return data[field]
@@ -9,7 +12,7 @@ def check_missing(format, data, field):
             raise Exception({"status_code": 400, "message": "Missing " + field})
 
 
-def check_correct_year(year):
+def validate_year(year):
     try:
         int(year)
         if len(str(year)) != 4:
@@ -19,12 +22,18 @@ def check_correct_year(year):
         raise Exception({"status_code": 400, "message": "Invalid year"})
 
 
-def check_int(number, field):
+def validate_int(number, field):
     try:
         int(number)
         return number
     except:
         raise Exception({"status_code": 400, "message": "Invalid " + field})
+
+
+def validate_string(string, field):
+    if not isinstance(string, str):
+        raise Exception({"status_code": 400, "message": "Invalid " + field})
+    return string
 
 
 def validate_assigning(assigned_type, assigned_id):
