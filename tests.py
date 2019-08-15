@@ -305,10 +305,10 @@ class BranchTestCase(unittest.TestCase):
         self.assertEqual(json_response, None)
 
         res = self.client.post('/branch/create')
-        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.status_code, 200)
 
         res = self.client.post('/branch/create', data=None, content_type='application/json')
-        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.status_code, 200)
 
         res = self.client.get('/branch/create')
         self.assertEqual(res.status_code, 405)

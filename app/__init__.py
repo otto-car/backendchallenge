@@ -125,67 +125,22 @@ def create_app(config_name):
     @app.route('/branch/create', methods=['POST'])
     def branch_create():
         if request.method == "POST":
-            request_data = request.get_json(force=True)
+            if request.data is None:
+                return jsonify({"status_code": 400, "message": "Invalid request"})
+            request_data = request.data
 
-            if request_data is None:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Invalid request"
-                })
-
-            if "city" in request_data.keys():
-                city = request_data['city']
-                if not isinstance(city, str):
-                    return jsonify({
-                        "status_code": 400,
-                        "message": "Invalid city"
-                    })
-            else:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Missing city"
-                })
-
-            if "postcode" in request_data.keys():
-                postcode = str(request_data['postcode'])
-                if len(postcode) > 8:
-                    return jsonify({
-                        "status_code": 400,
-                        "message": "Invalid postcode"
-                    })
-                pattern = re.compile(r'\b[A-Z]{1,2}[0-9][A-Z0-9]? [0-9][ABD-HJLNP-UW-Z]{2}\b')
-                if not pattern.match(postcode):
-                    return jsonify({
-                        "status_code": 400,
-                        "message": "Invalid postcode"
-                    })
-            else:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Missing postcode"
-                })
-
-            if "capacity" in request_data.keys():
-                try:
-                    int(request_data['capacity'])
-                    capacity = request_data['capacity']
-                except:
-                    return jsonify({
-                        "status_code": 400,
-                        "message": "Invalid capacity"
-                    })
-            else:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Missing capacity"
-                })
-
-            car = Branch(city, postcode, capacity)
-            car.save()
-            return jsonify({
-                "status_code": 201,
-                "message": "Branch created"}
-            )
+            try:
+                city = helpers.check_missing('list', request_data, 'city')
+                city = helpers.validate_string(city, 'city')
+                postcode = helpers.check_missing('list', request_data, 'postcode')
+                postcode = helpers.validate_postcode(postcode)
+                capacity = helpers.check_missing('list', request_data, 'capacity')
+                capacity = helpers.validate_int(capacity, 'capacity')
+                branch = Branch(city, postcode, capacity)
+                branch.save()
+                return jsonify({"status_code": 201, "message": "Branch created"})
+            except Exception as e:
+                return jsonify({"status_code": e.args[0]['status_code'], "message": e.args[0]['message']})
 
     @app.route('/branch/get', methods=['GET'])
     def branch_get():
