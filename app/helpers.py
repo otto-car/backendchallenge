@@ -29,7 +29,7 @@ def validate_year(year):
 
 def validate_int(number, field):
     try:
-        int(number)
+        number = int(number)
         return number
     except:
         raise Exception({"status_code": 400, "message": "Invalid " + field})
@@ -66,8 +66,12 @@ def validate_dob(dob):
 def validate_assigning(assigned_type, assigned_id):
     from app.models import Branch, Driver
 
-    if assigned_type not in (1, 2):
-        raise Exception({"status_code": 400, "message": "Invalid assigned type"})
+    assigned_id = validate_int(assigned_id, 'assigned_id')
+    assigned_type = validate_int(assigned_type, 'assigned_type')
+
+    allowed_types = [1, 2]
+    if assigned_type not in allowed_types:
+        raise Exception({"status_code": 400, "message": "Invalid assigned_type"})
 
     # type 1 is driver
     if assigned_type == 1:

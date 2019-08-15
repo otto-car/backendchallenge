@@ -115,7 +115,6 @@ class CarTestCase(unittest.TestCase):
         """ Test that API can retrieve a car"""
         data = dict(first_name="Alan", last_name="Turing", dob="23/06/1962")
         api_call(self, "POST", "/driver/create", data, 200, True)
-
         data = dict(make="BMW", model="530d", year=2018, assigned_type=1, assigned_id=1)
         api_call(self, "POST", '/car/create', data, 200)
 
@@ -124,6 +123,21 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response['make'], 'BMW')
         self.assertEqual(json_response['model'], '530d')
         self.assertEqual(json_response['year'], 2018)
+        self.assertEqual(json_response['assigned_type'], 1)
+        self.assertEqual(json_response['assigned_id'], 1)
+
+        data = dict(city="London", postcode="E1W3SS", capacity=10)
+        api_call(self, "POST", "/branch/create", data, 200, True)
+        data = dict(make="Vauxhall", model="Corsa", year=2001, assigned_type=2, assigned_id=1)
+        api_call(self, "POST", '/car/create', data, 200)
+
+        data = dict(id=2)
+        json_response = api_call(self, "GET", '/car/get', data, 200, True)
+        self.assertEqual(json_response['make'], 'Vauxhall')
+        self.assertEqual(json_response['model'], 'Corsa')
+        self.assertEqual(json_response['year'], 2001)
+        self.assertEqual(json_response['assigned_type'], 2)
+        self.assertEqual(json_response['assigned_id'], 1)
 
     def test_cant_get_car_invalid_request(self):
         """ Test that endpoint can deal with missing query string"""
@@ -142,8 +156,8 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response["status_code"], 400)
         self.assertEqual(json_response["message"], "Invalid request")
 
-    def test_cant_get_car_missing_params(self):
-        """ Test that endpoint can deal with empty param"""
+    def test_cant_get_car_invalid_params(self):
+        """ Test that endpoint can deal with invalid or missing params"""
         data = dict()
         json_response = api_call(self, "GET", '/car/get', data, 200, True)
         self.assertEqual(json_response["status_code"], 400)
@@ -154,48 +168,91 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(json_response["status_code"], 400)
         self.assertEqual(json_response["message"], "Invalid request")
 
-    def test_cant_get_car_id_doesnt_exist(self):
-        """ Test can't get car ID that doesn't exist"""
         data = dict(id=100)
         json_response = api_call(self, "GET", '/car/get', data, 200, True)
         self.assertEqual(json_response["status_code"], 404)
         self.assertEqual(json_response["message"], 'Car not found')
 
-    def test_cant_get_car_id_has_to_be_int(self):
-        """ Test can't get a car with invalid car ID """
         data = dict(id="abcd")
         json_response = api_call(self, "GET", '/car/get', data, 200, True)
         self.assertEqual(json_response["status_code"], 400)
         self.assertEqual(json_response["message"], 'Invalid id')
 
-    def test_can_update_car(self):
-        """ Test for updating car details"""
-        data = dict(first_name="Alan", last_name="Turing", dob="23/06/1962")
-        api_call(self, "POST", "/driver/create", data, 200, True)
-
-        data = dict(make="Tesla", model="Model 3", year=2015, assigned_type=1, assigned_id=1)
-        api_call(self, "POST", '/car/create', data, 200)
-
-        data = dict(id=1, model="Model X")
-        json_response = api_call(self, "PUT", '/car/update', data, 200, True)
-        self.assertEqual(json_response["status_code"], 200)
-        self.assertEqual(json_response["message"], "Car record was updated")
-
-        data = dict(id=1)
-        res = self.client.get('/car/get', query_string=data, content_type='application/json')
-        self.assertEqual(res.status_code, 200)
-        json_response = res.get_json()
-        self.assertEqual(json_response['model'], 'Model X')
-
-        data = dict(id=1, model="545i", year=2015)
-        json_response = api_call(self, "PUT", '/car/update', data, 200, True)
-        self.assertEqual(json_response["status_code"], 200)
-        self.assertEqual(json_response["message"], "Car record was updated")
-
         data = dict(id=1)
         json_response = api_call(self, "GET", '/car/get', data, 200, True)
-        self.assertEqual(json_response['model'], '545i')
-        self.assertEqual(json_response['year'], 2015)
+        self.assertEqual(json_response["status_code"], 404)
+        self.assertEqual(json_response["message"], 'Car not found')
+
+        data = dict(city="London", postcode="E1W3SS", capacity=10)
+        api_call(self, "POST", "/branch/create", data, 200, True)
+        data = dict(make="Vauxhall", model="Corsa", year=2001, assigned_type=2, assigned_id=1)
+        api_call(self, "POST", '/car/create', data, 200)
+
+        data = dict(id=1, year="twenty five")
+        json_response = api_call(self, "GET", '/car/get', data, 200, True)
+        self.assertEqual(json_response["status_code"], 400)
+        self.assertEqual(json_response["message"], 'Invalid year')
+
+        data = dict(assigned_type="twenty")
+        json_response = api_call(self, "GET", '/car/get', data, 200, True)
+        self.assertEqual(json_response["status_code"], 400)
+        self.assertEqual(json_response["message"], 'Missing assigned_id')
+
+        data = dict(assigned_type=3, assigned_id=1)
+        json_response = api_call(self, "GET", '/car/get', data, 200, True)
+        self.assertEqual(json_response["status_code"], 404)
+        self.assertEqual(json_response["message"], 'Car not found')
+
+        data = dict(assigned_type="blabla", assigned_id=1)
+        json_response = api_call(self, "GET", '/car/get', data, 200, True)
+        self.assertEqual(json_response["status_code"], 400)
+        self.assertEqual(json_response["message"], 'Invalid assigned_type')
+
+        data = dict(assigned_type=1, assigned_id="onetwothree")
+        json_response = api_call(self, "GET", '/car/get', data, 200, True)
+        self.assertEqual(json_response["status_code"], 400)
+        self.assertEqual(json_response["message"], 'Invalid assigned_id')
+
+    def test_can_update_car(self):
+        """ Test for updating car details"""
+        # Create branch and driver for further testing
+        api_call(self, "POST", "/driver/create", dict(first_name="Alan", last_name="Turing", dob="23/06/1962"), 200,
+                 True)
+        api_call(self, "POST", "/branch/create", dict(city="London", postcode="E1W3SS", capacity=10), 200, True)
+
+        # Create Tesla with assigned driver Alan
+        api_call(self, "POST", '/car/create', dict(make="Tesla", model="Model 3", year=2015, assigned_type=1,
+                                                   assigned_id=1), 200)
+
+        # Create BMW with assigned London branch
+        api_call(self, "POST", '/car/create', dict(make="BMW", model="530d", year=2018, assigned_type=2, assigned_id=1),
+                 200)
+
+        # Assign Tesla to London branch
+        api_call(self, "PUT", '/car/update', dict(id=1, assigned_type=2, assigned_id=1), 200, True)
+        json_response = api_call(self, "GET", '/car/get', dict(id=1), 200, True)
+        self.assertEqual(json_response['assigned_type'], 2)
+        self.assertEqual(json_response['assigned_id'], 1)
+
+        # Change Model 3 to X and year to 2018
+        api_call(self, "PUT", '/car/update', dict(id=1, model="Model X", year=2018), 200, True)
+        json_response = api_call(self, "GET", '/car/get', dict(id=1), 200, True)
+        self.assertEqual(json_response['make'], "Tesla")
+        self.assertEqual(json_response['model'], "Model X")
+        self.assertEqual(json_response['year'], 2018)
+
+        # Assign BMW to Alan driver
+        api_call(self, "PUT", '/car/update', dict(id=2, assigned_type=1, assigned_id=1), 200, True)
+        json_response = api_call(self, "GET", '/car/get', dict(id=2), 200, True)
+        self.assertEqual(json_response['assigned_type'], 1)
+        self.assertEqual(json_response['assigned_id'], 1)
+
+        # Change make to Mercedes, mode to E-Class and year to 2019
+        api_call(self, "PUT", '/car/update', dict(id=2,make="Mercedes", model="E-Class", year=2019), 200, True)
+        json_response = api_call(self, "GET", '/car/get', dict(id=2), 200, True)
+        self.assertEqual(json_response['make'], "Mercedes")
+        self.assertEqual(json_response['model'], "E-Class")
+        self.assertEqual(json_response['year'], 2019)
 
     def test_cant_update_car_invalid_requests(self):
         """" Test for correct method to be used when sending update requests"""
@@ -211,24 +268,55 @@ class CarTestCase(unittest.TestCase):
         res = self.client.get('/car/update')
         self.assertEqual(res.status_code, 405)
 
-    def test_cant_update_car_invalid_id(self):
-        """ Test that cant update car with ID taht doesn't exist"""
-        data = dict(id=257, year=2015)
-        json_response = api_call(self, "PUT", '/car/update', data, 200, True)
+    def test_cant_update_car_invalid_parameters(self):
+        """ Test can't update car with wrong or missing ID"""
+        # Test cases where car is
+        json_response = api_call(self, "PUT", '/car/update', dict(id=257, year=2015), 200, True)
         self.assertEqual(json_response["status_code"], 404)
         self.assertEqual(json_response["message"], "Car not found")
 
-    def test_cant_update_car_invalid_parameters(self):
-        """ Test can't update car with wrong or missing ID"""
-        data = dict(year=2018, make="Ford")
-        json_response = api_call(self, "PUT", '/car/update', data, 200, True)
+        json_response = api_call(self, "PUT", '/car/update', dict(year=2018, make="Ford"), 200, True)
         self.assertEqual(json_response["status_code"], 400)
         self.assertEqual(json_response["message"], "Missing id")
 
-        data = dict(id="cowabunga!", model="C45 AMG")
-        json_response = api_call(self, "PUT", '/car/update', data, 200, True)
+        json_response = api_call(self, "PUT", '/car/update', dict(id="cowabunga!", model="C45 AMG"), 200, True)
         self.assertEqual(json_response["status_code"], 400)
         self.assertEqual(json_response["message"], "Invalid id")
+
+        # Create BMW with assigned London branch
+        api_call(self, "POST", "/branch/create", dict(city="London", postcode="E1W3SS", capacity=10), 200, True)
+        api_call(self, "POST", '/car/create', dict(make="BMW", model="530d", year=2018, assigned_type=2, assigned_id=1),
+                 200)
+
+        # Case where year is invalid
+        json_response = api_call(self, "PUT", '/car/update', dict(id=1, year="C45 AMG", make="Mercedes-Benz"), 200, True)
+        self.assertEqual(json_response["status_code"], 400)
+        self.assertEqual(json_response["message"], "Invalid year")
+
+        # Case where wrong assign type
+        json_response = api_call(self, "PUT", '/car/update', dict(id=1, assigned_type=3, assigned_id=1), 200, True)
+        self.assertEqual(json_response["status_code"], 400)
+        self.assertEqual(json_response["message"], "Invalid assigned_type")
+
+        # Case where assign type is not int
+        json_response = api_call(self, "PUT", '/car/update', dict(id=1, assigned_type="oogabooga", assigned_id=1), 200, True)
+        self.assertEqual(json_response["status_code"], 400)
+        self.assertEqual(json_response["message"], "Invalid assigned_type")
+
+        # Case where assign id is not int
+        json_response = api_call(self, "PUT", '/car/update', dict(id=1, assigned_type=2, assigned_id="hey"), 200, True)
+        self.assertEqual(json_response["status_code"], 400)
+        self.assertEqual(json_response["message"], "Invalid assigned_id")
+
+        # Case where branch not found
+        json_response = api_call(self, "PUT", '/car/update', dict(id=1, assigned_type=2, assigned_id=20), 200, True)
+        self.assertEqual(json_response["status_code"], 404)
+        self.assertEqual(json_response["message"], "Branch not found")
+
+        # Case where driver not found
+        json_response = api_call(self, "PUT", '/car/update', dict(id=1, assigned_type=1, assigned_id=20), 200, True)
+        self.assertEqual(json_response["status_code"], 404)
+        self.assertEqual(json_response["message"], "Driver not found")
 
     def test_can_delete_car(self):
         """ Test can delete car """

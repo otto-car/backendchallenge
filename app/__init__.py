@@ -2,8 +2,6 @@ from flask_api import FlaskAPI, exceptions
 from flask_sqlalchemy import SQLAlchemy
 from instance.config import app_config
 from flask import request, jsonify
-import re
-import datetime
 from app import helpers
 
 db = SQLAlchemy()
@@ -56,8 +54,20 @@ def create_app(config_name):
                     params['model'] = helpers.validate_string(request.args.get('model'), 'model')
                 if "year" in request.args.keys():
                     params['year'] = helpers.validate_year(request.args.get('year'))
+
+                if "assigned_type" in request.args.keys() and not "assigned_id" in request.args.keys():
+                    raise Exception({"status_code": 400, "message": "Missing assigned_id"})
+
+                elif "assigned_id" in request.args.keys() and not "assigned_type" in request.args.keys():
+                    raise Exception({"status_code": 400, "message": "Missing assigned_type"})
+
+                elif "assigned_type" in request.args.keys() and "assigned_id" in request.args.keys():
+                    params['assigned_type'] = helpers.validate_int(request.args.get('assigned_type'), 'assigned_type')
+                    params['assigned_id'] = helpers.validate_int(request.args.get('assigned_id'), 'assigned_id')
                 if not params:
                     raise Exception({"status_code": 400, "message": "Invalid request"})
+
+
                 car = Car.get(params)
                 if not car:
                     raise Exception({"status_code": 404, "message": "Car not found"})
