@@ -206,7 +206,7 @@ class CarTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 405)
 
         res = self.client.put('/car/update')
-        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.status_code, 200)
 
         res = self.client.get('/car/update')
         self.assertEqual(res.status_code, 405)
@@ -223,12 +223,12 @@ class CarTestCase(unittest.TestCase):
         data = dict(year=2018, make="Ford")
         json_response = api_call(self, "PUT", '/car/update', data, 200, True)
         self.assertEqual(json_response["status_code"], 400)
-        self.assertEqual(json_response["message"], "Missing ID")
+        self.assertEqual(json_response["message"], "Missing id")
 
         data = dict(id="cowabunga!", model="C45 AMG")
         json_response = api_call(self, "PUT", '/car/update', data, 200, True)
         self.assertEqual(json_response["status_code"], 400)
-        self.assertEqual(json_response["message"], "Invalid ID")
+        self.assertEqual(json_response["message"], "Invalid id")
 
     def test_can_delete_car(self):
         """ Test can delete car """

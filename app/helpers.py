@@ -38,8 +38,9 @@ def validate_string(string, field):
 
 def validate_assigning(assigned_type, assigned_id):
     from app.models import Branch, Driver
+
     if assigned_type not in (1, 2):
-        return Exception({"status_code": 400, "message": "Invalid assigned type"})
+        raise Exception({"status_code": 400, "message": "Invalid assigned type"})
 
     # type 1 is driver
     if assigned_type == 1:
@@ -59,8 +60,8 @@ def validate_assigning(assigned_type, assigned_id):
         if branch:
             occupancy = branch.get_assigned_cars_count(assigned_id)
             if branch.capacity > occupancy:
-                assigned_id = assigned_id
+                return [assigned_type, assigned_id]
             else:
-                return Exception({"status_code": 400, "message": "Branch has reached its capacity"})
+                raise Exception({"status_code": 400, "message": "Branch has reached its capacity"})
         else:
-            return Exception({"status_code": 404, "message": "Branch not found"})
+            raise Exception({"status_code": 404, "message": "Branch not found"})
