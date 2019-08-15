@@ -744,14 +744,14 @@ class DriverTestCase(unittest.TestCase):
         data = dict(id="i_love_pizza")
         json_response = api_call(self, "DELETE", '/driver/delete', data, 200, True)
         self.assertEqual(json_response["status_code"], 400)
-        self.assertEqual(json_response["message"], "Invalid driver ID")
+        self.assertEqual(json_response["message"], "Invalid id")
 
     def test_cant_delete_driver_invalid_request(self):
         """ Test we can't delete driver with bad request"""
         data = dict()
         json_response = api_call(self, "DELETE", '/driver/delete', data, 200, True)
         self.assertEqual(json_response["status_code"], 400)
-        self.assertEqual(json_response["message"], 'Missing driver ID')
+        self.assertEqual(json_response["message"], 'Missing id')
 
         res = self.client.post('/driver/delete')
         self.assertEqual(res.status_code, 405)

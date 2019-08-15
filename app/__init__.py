@@ -293,37 +293,19 @@ def create_app(config_name):
     @app.route('/driver/delete', methods=['DELETE'])
     def driver_delete():
         if request.method == "DELETE":
-
-            if not "id" in request.args:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Missing driver ID"
-                })
-
-            id = request.args.get("id")
+            if request.args is None:
+                return jsonify({"status_code": 400, "message": "Invalid request"})
 
             try:
-                int(id)
-            except:
-                return jsonify({
-                    "status_code": 400,
-                    "message": "Invalid driver ID"
-                })
-
-            params = {"id": id}
-            driver = Driver.get(params)
-
-            if not driver:
-                return jsonify({
-                    "status_code": 404,
-                    "message": "Driver not found"
-                })
-
-            driver.delete()
-
-            return jsonify({
-                "status_code": 200,
-                "message": "Driver deleted"
-            })
+                id = helpers.check_missing('args', request, 'id')
+                id = helpers.validate_int(id, 'id')
+                params = {"id": id}
+                driver = Driver.get(params)
+                if not driver:
+                    return jsonify({"status_code": 404, "message": "Driver not found"})
+                driver.delete()
+                return jsonify({"status_code": 200,"message": "Driver deleted"})
+            except Exception as e:
+                return jsonify({"status_code": e.args[0]['status_code'], "message": e.args[0]['message']})
 
     return app
